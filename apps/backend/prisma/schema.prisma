@@ -1,0 +1,403 @@
+// Schema de base de datos - SaaS Multiempresa para Iglesias
+// Ver docs/IMPLEMENTADO.md para decisiones tomadas sobre puntos abiertos del PRD (sección 35)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum GlobalRole {
+  SUPER_ADMIN
+  NONE
+}
+
+enum TenantRole {
+  ADMIN // Administrador de Iglesia
+  OPERATOR // Operador / Secretario
+  VIEWER // Usuario de consulta
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum EventType {
+  MASS
+  CELEBRATION
+  MEETING
+  BAPTISM
+  WEDDING
+  FUNERAL
+  CONFESSION
+  PARISH_ACTIVITY
+  CUSTOM
+}
+
+enum EventStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+enum MassIntentionStatus {
+  PENDING // sin donación / sin recibir dinero completo
+  PARTIALLY_FUNDED
+  FUNDED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  CARD
+  OTHER
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+// source_type de FinancialTransaction: de dónde se originó el movimiento
+enum TransactionSourceType {
+  DONATION
+  INCOME
+  EXPENSE
+  MANUAL // ajuste u operación de corrección/reversión
+}
+
+enum PeriodStatus {
+  OPEN
+  CLOSED
+}
+
+enum AuditAction {
+  LOGIN
+  CREATE_EVENT
+  UPDATE_EVENT
+  DELETE_EVENT
+  CREATE_INTENTION
+  UPDATE_INTENTION
+  CREATE_DONATION
+  CREATE_INCOME
+  UPDATE_INCOME
+  DELETE_INCOME
+  CREATE_EXPENSE
+  UPDATE_EXPENSE
+  DELETE_EXPENSE
+  VOID_TRANSACTION
+  CLOSE_PERIOD
+  CREATE_USER
+  UPDATE_USER
+  DEACTIVATE_USER
+  CREATE_TENANT
+  UPDATE_TENANT
+}
+
+// ============================================================
+// TENANCY / SUPER ADMIN
+// ============================================================
+
+// Plan comercial (fase 3, ya modelado para no romper esquema luego)
+model Plan {
+  id          String   @id @default(uuid())
+  name        String   @unique // FREE, BASIC, PRO, ENTERPRISE
+  maxUsers    Int?
+  maxEvents   Int?
+  createdAt   DateTime @default(now())
+  tenants     Tenant[]
+}
+
+model Tenant {
+  id        String       @id @default(uuid())
+  name      String
+  slug      String       @unique
+  status    TenantStatus @default(ACTIVE)
+  timezone  String       @default("America/Bogota") // punto abierto #12, ver docs
+  currency  String       @default("COP") // punto abierto #11
+  planId    String?
+  plan      Plan?        @relation(fields: [planId], references: [id])
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  userTenants        UserTenant[]
+  events             Event[]
+  massIntentions     MassIntention[]
+  donations          Donation[]
+  incomes            Income[]
+  expenses           Expense[]
+  categories         Category[]
+  financialTxns      FinancialTransaction[]
+  accountingPeriods  AccountingPeriod[]
+  auditLogs          AuditLog[]
+
+  @@index([slug])
+}
+
+// Usuario global (puede pertenecer a varios tenants, o ser Super Admin sin tenant)
+model User {
+  id          String     @id @default(uuid())
+  email       String     @unique
+  fullName    String
+  googleId    String?    @unique
+  avatarUrl   String?
+  globalRole  GlobalRole @default(NONE)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  userTenants        UserTenant[]
+  createdEvents      Event[]              @relation("EventCreatedBy")
+  createdDonations   Donation[]           @relation("DonationCreatedBy")
+  createdIncomes     Income[]             @relation("IncomeCreatedBy")
+  createdExpenses    Expense[]            @relation("ExpenseCreatedBy")
+  createdTxns        FinancialTransaction[] @relation("TxnCreatedBy")
+  closedPeriods      AccountingPeriod[]   @relation("PeriodClosedBy")
+  auditLogs          AuditLog[]
+}
+
+// Relación N:M usuario <-> tenant, con rol específico por tenant
+model UserTenant {
+  id        String     @id @default(uuid())
+  userId    String
+  tenantId  String
+  role      TenantRole
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([tenantId])
+}
+
+// ============================================================
+// CALENDARIO
+// ============================================================
+
+model Event {
+  id             String      @id @default(uuid())
+  tenantId       String
+  title          String
+  description    String?
+  eventType      EventType
+  startDatetime  DateTime
+  endDatetime    DateTime?
+  location       String?
+  status         EventStatus @default(SCHEDULED)
+  createdById    String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy      User?           @relation("EventCreatedBy", fields: [createdById], references: [id])
+  massIntentions MassIntention[]
+
+  @@index([tenantId, startDatetime])
+}
+
+// ============================================================
+// INTENCIONES DE MISA
+// ============================================================
+
+model MassIntention {
+  id              String               @id @default(uuid())
+  tenantId        String
+  eventId         String?
+  intentionType   String? // ej: "difunto", "salud", "accion de gracias"
+  description     String
+  requesterName   String
+  requesterPhone  String?
+  expectedAmount  Decimal              @db.Decimal(14, 2)
+  status          MassIntentionStatus  @default(PENDING)
+  notes           String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  event     Event?     @relation(fields: [eventId], references: [id])
+  donations Donation[]
+
+  @@index([tenantId, status])
+}
+
+// ============================================================
+// DONACIONES
+// ============================================================
+
+model Donation {
+  id               String        @id @default(uuid())
+  tenantId         String
+  massIntentionId  String
+  amount           Decimal       @db.Decimal(14, 2)
+  paymentMethod    PaymentMethod
+  receivedAt       DateTime
+  reference        String?
+  notes            String?
+  createdById      String?
+  createdAt        DateTime      @default(now())
+
+  tenant        Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  massIntention MassIntention          @relation(fields: [massIntentionId], references: [id], onDelete: Cascade)
+  createdBy     User?                  @relation("DonationCreatedBy", fields: [createdById], references: [id])
+  transactions  FinancialTransaction[]
+
+  @@index([tenantId, receivedAt])
+}
+
+// ============================================================
+// CATEGORÍAS (configurables por tenant)
+// ============================================================
+
+model Category {
+  id        String       @id @default(uuid())
+  tenantId  String
+  type      CategoryType
+  name      String
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+
+  tenant       Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  incomes      Income[]
+  expenses     Expense[]
+  transactions FinancialTransaction[]
+
+  @@unique([tenantId, type, name])
+  @@index([tenantId, type])
+}
+
+// ============================================================
+// INGRESOS / EGRESOS
+// ============================================================
+
+model Income {
+  id            String        @id @default(uuid())
+  tenantId      String
+  date          DateTime
+  categoryId    String
+  description   String
+  amount        Decimal       @db.Decimal(14, 2)
+  paymentMethod PaymentMethod
+  reference     String?
+  createdById   String?
+  createdAt     DateTime      @default(now())
+
+  tenant       Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category     Category               @relation(fields: [categoryId], references: [id])
+  createdBy    User?                  @relation("IncomeCreatedBy", fields: [createdById], references: [id])
+  transactions FinancialTransaction[]
+
+  @@index([tenantId, date])
+}
+
+model Expense {
+  id            String        @id @default(uuid())
+  tenantId      String
+  date          DateTime
+  categoryId    String
+  description   String
+  amount        Decimal       @db.Decimal(14, 2)
+  paymentMethod PaymentMethod
+  reference     String?
+  supplier      String?
+  notes         String?
+  createdById   String?
+  createdAt     DateTime      @default(now())
+
+  tenant       Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category     Category               @relation(fields: [categoryId], references: [id])
+  createdBy    User?                  @relation("ExpenseCreatedBy", fields: [createdById], references: [id])
+  transactions FinancialTransaction[]
+
+  @@index([tenantId, date])
+}
+
+// ============================================================
+// LIBRO FINANCIERO (fuente única para balances/reportes/cierres)
+// ============================================================
+
+model FinancialTransaction {
+  id           String                @id @default(uuid())
+  tenantId     String
+  type         TransactionType
+  amount       Decimal               @db.Decimal(14, 2)
+  date         DateTime
+  categoryId   String?
+  description  String
+  sourceType   TransactionSourceType
+  sourceId     String? // id de Donation / Income / Expense que lo originó
+  reference    String?
+  isVoided     Boolean               @default(false)
+  voidedTxnId  String?               @unique // si esta transacción es una reversión, apunta a la original
+  createdById  String?
+  createdAt    DateTime              @default(now())
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category   Category?  @relation(fields: [categoryId], references: [id])
+  donation   Donation?  @relation(fields: [sourceId], references: [id], map: "fk_txn_donation")
+  income     Income?    @relation(fields: [sourceId], references: [id], map: "fk_txn_income")
+  expense    Expense?   @relation(fields: [sourceId], references: [id], map: "fk_txn_expense")
+  createdBy  User?      @relation("TxnCreatedBy", fields: [createdById], references: [id])
+
+  @@index([tenantId, date])
+  @@index([tenantId, type])
+  @@index([sourceType, sourceId])
+}
+
+// ============================================================
+// PERÍODOS CONTABLES
+// ============================================================
+
+model AccountingPeriod {
+  id        String       @id @default(uuid())
+  tenantId  String
+  year      Int
+  month     Int // 1-12
+  status    PeriodStatus @default(OPEN)
+  closedAt  DateTime?
+  closedById String?
+  createdAt DateTime     @default(now())
+
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  closedBy User?  @relation("PeriodClosedBy", fields: [closedById], references: [id])
+
+  @@unique([tenantId, year, month])
+  @@index([tenantId, status])
+}
+
+// ============================================================
+// AUDITORÍA
+// ============================================================
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  tenantId   String?
+  userId     String?
+  action     AuditAction
+  entityType String
+  entityId   String?
+  oldValues  Json?
+  newValues  Json?
+  createdAt  DateTime    @default(now())
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, createdAt])
+  @@index([entityType, entityId])
+}

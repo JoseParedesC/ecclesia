@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: iglesias-saas-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: iglesias
+      POSTGRES_PASSWORD: iglesias_dev_password
+      POSTGRES_DB: iglesias_saas
+    ports:
+      - "5432:5432"
+    volumes:
+      - iglesias_pgdata:/var/lib/postgresql/data
+
+volumes:
+  iglesias_pgdata:

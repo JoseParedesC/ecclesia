@@ -1,0 +1,20 @@
+{
+  "name": "ecclesia",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SaaS multiempresa para gestión de eventos, intenciones, donaciones y finanzas de iglesias",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm run start:dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "db:up": "docker compose up -d postgres",
+    "db:migrate": "npm run prisma:migrate --workspace=backend",
+    "db:seed": "npm run prisma:seed --workspace=backend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
