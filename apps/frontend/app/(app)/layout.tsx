@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       <aside className="md:w-56 bg-brand-dark text-white p-4 md:min-h-screen">
-        <h2 className="font-semibold mb-4">Iglesia</h2>
+        <h2 className="font-semibold mb-4">Ecclesia</h2>
         <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
           {nav.map((item) => (
             <Link

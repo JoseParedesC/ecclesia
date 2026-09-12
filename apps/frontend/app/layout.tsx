@@ -2,7 +2,7 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata = {
-  title: 'SaaS Iglesias — Gestión de Eventos, Intenciones y Finanzas',
+  title: 'Ecclesia — Gestión de Eventos, Intenciones y Finanzas',
   description: 'Plataforma multiempresa para iglesias, parroquias y comunidades religiosas',
 };
 
