@@ -23,7 +23,7 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleCallback(@Req() req, @Res() res: Response) {
+  async googleCallback(@Req() req: any, @Res() res: Response) {
     const result = await this.authService.loginWithGoogle(req.user);
 
     const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';

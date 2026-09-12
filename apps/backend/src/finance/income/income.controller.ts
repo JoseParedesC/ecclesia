@@ -5,6 +5,7 @@ import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { requireTenantId } from '../../common/utils/require-tenant.util';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 
 @Controller('income')
@@ -29,18 +30,18 @@ export class IncomeController {
   @Post()
   @Roles(TenantRole.ADMIN, TenantRole.OPERATOR)
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateIncomeDto) {
-    return this.incomeService.create(user.tenantId, user.userId, dto);
+    return this.incomeService.create(requireTenantId(user), user.userId, dto);
   }
 
   @Patch(':id')
   @Roles(TenantRole.ADMIN)
   update(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: UpdateIncomeDto) {
-    return this.incomeService.update(user.tenantId, user.userId, id, dto);
+    return this.incomeService.update(requireTenantId(user), user.userId, id, dto);
   }
 
   @Delete(':id')
   @Roles(TenantRole.ADMIN)
   remove(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.incomeService.remove(user.tenantId, user.userId, id);
+    return this.incomeService.remove(requireTenantId(user), user.userId, id);
   }
 }

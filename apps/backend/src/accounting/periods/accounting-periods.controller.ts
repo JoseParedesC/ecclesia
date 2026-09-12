@@ -3,6 +3,7 @@ import { TenantRole } from '@prisma/client';
 import { AccountingPeriodsService } from './accounting-periods.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { requireTenantId } from '../../common/utils/require-tenant.util';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 
 @Controller('accounting-periods')
@@ -33,6 +34,6 @@ export class AccountingPeriodsController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
   ) {
-    return this.periodsService.close(user.tenantId, id, user.userId);
+    return this.periodsService.close(requireTenantId(user), id, user.userId);
   }
 }

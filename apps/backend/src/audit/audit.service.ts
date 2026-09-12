@@ -8,8 +8,12 @@ interface LogParams {
   action: AuditAction;
   entityType: string;
   entityId?: string;
-  oldValues?: Record<string, unknown> | null;
-  newValues?: Record<string, unknown> | null;
+  // `unknown` a propósito: aquí se recibe indistintamente un DTO (clase, sin
+  // índice de tipo string) o un registro plano de Prisma. Ambos se serializan
+  // igual como JSON al guardar; forzar Record<string, unknown> rompía la
+  // compilación con clases de class-validator (no tienen index signature).
+  oldValues?: unknown;
+  newValues?: unknown;
 }
 
 // Servicio simple e inyectable. Se invoca explícitamente desde cada servicio
@@ -30,8 +34,10 @@ export class AuditService {
           action: params.action,
           entityType: params.entityType,
           entityId: params.entityId,
-          oldValues: params.oldValues ?? undefined,
-          newValues: params.newValues ?? undefined,
+          // Cast a Prisma.InputJsonValue: son datos de auditoría de solo
+          // lectura, no hay riesgo de inyectar algo que rompa el esquema.
+          oldValues: (params.oldValues ?? undefined) as any,
+          newValues: (params.newValues ?? undefined) as any,
         },
       });
     } catch (err) {

@@ -5,6 +5,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { requireTenantId } from '../common/utils/require-tenant.util';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 
 @Controller('events')
@@ -28,18 +29,18 @@ export class EventsController {
   @Post()
   @Roles(TenantRole.ADMIN, TenantRole.OPERATOR)
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateEventDto) {
-    return this.eventsService.create(user.tenantId, user.userId, dto);
+    return this.eventsService.create(requireTenantId(user), user.userId, dto);
   }
 
   @Patch(':id')
   @Roles(TenantRole.ADMIN, TenantRole.OPERATOR)
   update(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: UpdateEventDto) {
-    return this.eventsService.update(user.tenantId, user.userId, id, dto);
+    return this.eventsService.update(requireTenantId(user), user.userId, id, dto);
   }
 
   @Delete(':id')
   @Roles(TenantRole.ADMIN)
   remove(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.eventsService.remove(user.tenantId, user.userId, id);
+    return this.eventsService.remove(requireTenantId(user), user.userId, id);
   }
 }

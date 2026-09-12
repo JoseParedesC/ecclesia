@@ -4,6 +4,7 @@ import { TransactionsService } from './transactions.service';
 import { VoidTransactionDto } from './dto/void-transaction.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { requireTenantId } from '../../common/utils/require-tenant.util';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 
 @Controller('financial-transactions')
@@ -28,6 +29,6 @@ export class TransactionsController {
     @Param('id') id: string,
     @Body() dto: VoidTransactionDto,
   ) {
-    return this.transactionsService.voidTransaction(user.tenantId, user.userId, id, dto);
+    return this.transactionsService.voidTransaction(requireTenantId(user), user.userId, id, dto);
   }
 }
