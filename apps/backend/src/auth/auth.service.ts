@@ -4,9 +4,8 @@ import { GlobalRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { NoActiveTenantException } from '../common/exceptions/domain.exception';
-import { getAccessExpiresIn, getAccessSecret, getRefreshExpiresIn, getRefreshSecret } from './auth-config';
 
-export interface GoogleUserPayload {
+interface GoogleUserPayload {
   googleId: string;
   email: string;
   fullName: string;
@@ -91,7 +90,7 @@ export class AuthService {
       // token temporal de identidad, sin tenant, corta duración, solo para /auth/select-tenant
       pendingToken: this.jwtService.sign(
         { userId: user.id, email: user.email, globalRole: user.globalRole, tenantId: null, tenantRole: null },
-        { secret: getAccessSecret(), expiresIn: '5m' },
+        { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '5m' },
       ),
     };
   }
@@ -117,7 +116,7 @@ export class AuthService {
   async refresh(refreshToken: string) {
     try {
       const payload = this.jwtService.verify<AuthenticatedUser>(refreshToken, {
-        secret: getRefreshSecret(),
+        secret: process.env.JWT_REFRESH_SECRET,
       });
       return this.issueTokens(payload);
     } catch {
@@ -127,12 +126,12 @@ export class AuthService {
 
   private issueTokens(payload: AuthenticatedUser) {
     const accessToken = this.jwtService.sign(payload, {
-      secret: getAccessSecret(),
-      expiresIn: getAccessExpiresIn(),
+      secret: process.env.JWT_ACCESS_SECRET,
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN ?? '15m',
     });
     const refreshToken = this.jwtService.sign(payload, {
-      secret: getRefreshSecret(),
-      expiresIn: getRefreshExpiresIn(),
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
     });
     return { accessToken, refreshToken, user: payload };
   }

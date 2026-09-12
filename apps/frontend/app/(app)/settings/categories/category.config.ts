@@ -2,8 +2,6 @@
 // Estructura basada en el README de @joseparedesc/master-crud: un mismo
 // objeto `config` sirve tanto para el adaptador REST como para las columnas
 // y el formulario que renderiza <MasterCrud />.
-import { z } from 'zod';
-
 export interface Category {
   id: string;
   type: 'INCOME' | 'EXPENSE';
@@ -13,10 +11,6 @@ export interface Category {
 
 export const categoryConfig = {
   collection: 'categories',
-  title: 'Categorías',
-  singularTitle: 'Categoría',
-  nameField: 'name',
-  searchableFields: ['name', 'type'],
   columns: [
     { key: 'name', label: 'Nombre' },
     { key: 'type', label: 'Tipo', render: (c: Category) => (c.type === 'INCOME' ? 'Ingreso' : 'Egreso') },
@@ -35,8 +29,6 @@ export const categoryConfig = {
       ],
     },
   ],
-  validationSchema: z.object({
-    name: z.string().trim().min(1),
-    type: z.enum(['INCOME', 'EXPENSE']),
-  }),
+  // validationSchema: se puede conectar zod/yup aquí si el proyecto lo adopta;
+  // en el MVP la validación fuerte vive en los DTOs del backend (class-validator).
 };

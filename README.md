@@ -7,7 +7,8 @@ iglesias (tenants) sobre una única base de datos PostgreSQL.
 
 Ver también:
 - `docs/DECISIONES.md` — decisiones tomadas sobre los puntos abiertos del PRD.
-- `docs/IMPLEMENTADO.md` — qué está implementado y qué falta.
+- `docs/implementado/README.md` — qué está implementado.
+- `docs/faltante/README.md` — qué falta y cómo priorizarlo.
 
 ## Estructura
 

@@ -4,7 +4,7 @@ import { DonationsService } from './donations.service';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { AuthenticatedUser, requireTenantId } from '../auth/types/authenticated-user.type';
+import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 
 @Controller('donations')
 export class DonationsController {
@@ -23,6 +23,6 @@ export class DonationsController {
   @Post()
   @Roles(TenantRole.ADMIN, TenantRole.OPERATOR)
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateDonationDto) {
-    return this.donationsService.create(requireTenantId(user), user.userId, dto);
+    return this.donationsService.create(user.tenantId, user.userId, dto);
   }
 }

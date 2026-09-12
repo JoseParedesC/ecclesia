@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AuditAction, Prisma } from '@prisma/client';
+import { AuditAction } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface LogParams {
@@ -8,8 +8,8 @@ interface LogParams {
   action: AuditAction;
   entityType: string;
   entityId?: string;
-  oldValues?: unknown;
-  newValues?: unknown;
+  oldValues?: Record<string, unknown> | null;
+  newValues?: Record<string, unknown> | null;
 }
 
 // Servicio simple e inyectable. Se invoca explícitamente desde cada servicio
@@ -30,12 +30,8 @@ export class AuditService {
           action: params.action,
           entityType: params.entityType,
           entityId: params.entityId,
-          oldValues: params.oldValues == null
-            ? undefined
-            : JSON.parse(JSON.stringify(params.oldValues)) as Prisma.InputJsonValue,
-          newValues: params.newValues == null
-            ? undefined
-            : JSON.parse(JSON.stringify(params.newValues)) as Prisma.InputJsonValue,
+          oldValues: params.oldValues ?? undefined,
+          newValues: params.newValues ?? undefined,
         },
       });
     } catch (err) {

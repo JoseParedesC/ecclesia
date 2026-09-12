@@ -26,11 +26,7 @@ export default function CategoriesPage() {
       <p className="text-sm text-gray-500">
         Categorías de ingresos y egresos configurables por iglesia (PRD sección 11).
       </p>
-      <MasterCrud
-        adapter={adapter}
-        config={categoryConfig as never}
-        currentUser={{ uid: 'current-user' }}
-      />
+      <MasterCrud adapter={adapter} config={categoryConfig} />
     </div>
   );
 }

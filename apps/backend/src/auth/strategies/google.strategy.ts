@@ -7,15 +7,10 @@ import { Strategy, VerifyCallback, Profile } from 'passport-google-oauth20';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    if (!clientSecret) {
-      throw new Error('Falta GOOGLE_CLIENT_SECRET en apps/backend/.env.');
-    }
-
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL ?? '',
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
       scope: ['email', 'profile'],
     });
   }

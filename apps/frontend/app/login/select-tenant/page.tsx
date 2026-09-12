@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authStorage } from '../../../lib/auth-storage';
 
@@ -15,7 +14,7 @@ interface TenantOption {
 
 // Se muestra cuando el mismo usuario pertenece a varias iglesias (ver
 // AuthService.loginWithGoogle -> requiresTenantSelection).
-function SelectTenantContent() {
+export default function SelectTenantPage() {
   const router = useRouter();
   const params = useSearchParams();
   const pendingToken = params.get('pendingToken') ?? '';
@@ -51,13 +50,5 @@ function SelectTenantContent() {
         ))}
       </div>
     </main>
-  );
-}
-
-export default function SelectTenantPage() {
-  return (
-    <Suspense fallback={<p className="p-8 text-center">Cargando iglesias...</p>}>
-      <SelectTenantContent />
-    </Suspense>
   );
 }

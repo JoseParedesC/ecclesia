@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
-import { AuthService, GoogleUserPayload } from './auth.service';
+import { Response } from 'express';
+import { AuthService } from './auth.service';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { SelectTenantDto } from './dto/select-tenant.dto';
@@ -23,8 +23,8 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleCallback(@Req() req: Request, @Res() res: Response) {
-    const result = await this.authService.loginWithGoogle(req.user as GoogleUserPayload);
+  async googleCallback(@Req() req, @Res() res: Response) {
+    const result = await this.authService.loginWithGoogle(req.user);
 
     const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
 

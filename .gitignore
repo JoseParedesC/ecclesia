@@ -6,6 +6,3 @@ dist/
 *.log
 .DS_Store
 backend/prisma/migrations/**/migration.sql.bak
-apps/backend/.env   
-apps/backend/.env.local
-apps/frontend/.env
