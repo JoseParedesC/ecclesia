@@ -13,12 +13,18 @@ import { usersRouter } from "./routes/users.js";
 // Crea las tablas si no existen (desactivar con AUTO_MIGRATE=false)
 if (process.env.AUTO_MIGRATE !== "false") await runMigrations();
 
-if (config.bootstrapAdmin) {
-  const { rowCount } = await pool.query("SELECT 1 FROM users LIMIT 1");
-  if (!rowCount) {
-    await pool.query("INSERT INTO users (email, role) VALUES ($1, 'administrador')", [config.bootstrapAdmin]);
-    console.log(`Administrador inicial creado: ${config.bootstrapAdmin}`);
-  }
+// Garantiza que el administrador inicial exista, esté activo y tenga rol de administrador.
+// Si corriges BOOTSTRAP_ADMIN_EMAIL, el nuevo correo se registra en el siguiente arranque.
+const bootstrapEmail = config.bootstrapAdmin?.trim();
+if (bootstrapEmail) {
+  if (bootstrapEmail === "tu-correo@gmail.com")
+    console.warn("BOOTSTRAP_ADMIN_EMAIL tiene el valor de ejemplo; usa el correo real de tu cuenta de Google.");
+  await pool.query(
+    `INSERT INTO users (email, role, active) VALUES ($1, 'administrador', true)
+     ON CONFLICT (lower(email)) DO UPDATE SET role = 'administrador', active = true`,
+    [bootstrapEmail],
+  );
+  console.log(`Administrador inicial asegurado: ${bootstrapEmail}`);
 }
 
 const app = express();

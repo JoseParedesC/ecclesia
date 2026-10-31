@@ -14,7 +14,8 @@ Control de ingresos y egresos de una parroquia, con cierre mensual y consolidado
 3. Copia `frontend/.env.example` → `frontend/.env` con los datos de tu app web de Firebase (Authentication → proveedor Google activado).
 4. `cd frontend && npm install && npm run dev` → http://localhost:5173
 
-El primer inicio de sesión debe hacerse con el correo de `BOOTSTRAP_ADMIN_EMAIL`. Los demás usuarios se registran con `POST /api/users` (solo administrador) indicando correo y rol.
+En cada arranque el backend asegura que el correo de `BOOTSTRAP_ADMIN_EMAIL` exista como administrador activo (si lo corriges, se registra en el siguiente arranque; la fila del correo anterior no se borra).
+El primer inicio de sesión debe hacerse con ese correo. Los demás usuarios se registran con `POST /api/users` (solo administrador) indicando correo y rol.
 
 ## Reglas de negocio implementadas
 
