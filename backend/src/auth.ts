@@ -18,7 +18,8 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
   let decoded;
   try {
     decoded = await getAuth().verifyIdToken(header.slice(7));
-  } catch {
+  } catch (err) {
+    console.error("verifyIdToken falló:", (err as { code?: string; message?: string }).code, (err as Error).message);
     throw new HttpError(401, "La sesión expiró. Vuelve a iniciar sesión.");
   }
   if (!decoded.email || !decoded.email_verified) throw new HttpError(403, "Tu correo de Google no está verificado.");
