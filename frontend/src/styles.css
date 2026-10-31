@@ -4,10 +4,21 @@
 
 /* Sin colores ni medidas propias: todo viene de theme.tokens.json vía Tailwind. */
 @layer base {
-  body { @apply bg-bg font-sans text-ink antialiased transition-colors duration-base ease-standard; }
-  h1, h2, h3 { @apply font-serif font-semibold; }
+  html { scrollbar-gutter: stable; }
+  body {
+    @apply bg-bg font-sans text-ink antialiased transition-colors duration-base ease-standard;
+    font-feature-settings: "cv11", "ss01", "tnum" 0;
+    background-image:
+      radial-gradient(60rem 28rem at 100% -8%, rgb(var(--c-primary-soft) / 0.75), transparent 70%),
+      radial-gradient(40rem 22rem at -10% 110%, rgb(var(--c-primary-soft) / 0.45), transparent 70%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3 { @apply font-serif font-semibold tracking-tight; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { @apply rounded-full border-2 border-solid border-transparent bg-line bg-clip-content; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-muted/50; }
   :focus-visible { @apply outline outline-2 outline-offset-2 outline-primary; }
-  ::selection { @apply bg-primary-soft text-ink; }
+  ::selection { @apply bg-primary/30 text-ink; }
 }
 
 @page { size: A4; margin: 14mm; }

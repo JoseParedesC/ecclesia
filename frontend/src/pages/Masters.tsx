@@ -27,7 +27,7 @@ function MasterTab({ kind }: { kind: "income" | "expense" }) {
     [config],
   );
 
-  if (!config || !adapter) return <div className="flex justify-center py-16 text-primary"><Spinner className="h-6 w-6" /></div>;
+  if (!config || !adapter) return <div className="flex justify-center py-16 text-primary_"><Spinner className="h-6 w-6" /></div>;
   return <MasterCrud adapter={adapter} config={config} currentUser={{ uid: String(me!.id) }} />;
 }
 

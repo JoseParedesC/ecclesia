@@ -48,6 +48,10 @@ Igual que los maestros, cada módulo tiene dos pantallas:
 
 Los registros creados antes de esta versión no tienen responsable; al editarlos se pedirá.
 
+## Usuarios
+
+Mismo patrón de dos pantallas: listado `/users` (búsqueda, filtros por rol y estado, activar/desactivar) y formulario en `/users/new` y `/users/:id/edit`.
+
 ## Reportes e impresión
 
 Sección **Reportes** (todos los roles): ingresos y egresos (rango de fechas, categoría y tipo), intenciones (por fecha de realización o de registro) y consolidado mensual (también en CSV). El botón **Imprimir** abre el diálogo del navegador (ahí se puede elegir "Guardar como PDF"); solo se imprime la hoja del reporte, siempre en colores claros.

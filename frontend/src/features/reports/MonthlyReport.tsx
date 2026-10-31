@@ -66,7 +66,7 @@ export function MonthlyReport() {
           {data.expenses.length > 0 && <Totals t={section(data.expenses, "SERVICIO", "GASTO")} label="Total egresos" />}
           <div className="mt-8 flex items-baseline justify-between rounded-lg border border-line bg-mist/60 px-5 py-4 print:break-inside-avoid">
             <span className="font-serif text-lg">Saldo del período</span>
-            <span className="font-serif text-2xl font-semibold tabular-nums text-primary">{money(data.totals.saldo)}</span>
+            <span className="font-serif text-2xl font-semibold tabular-nums text-primary_">{money(data.totals.saldo)}</span>
           </div>
         </ReportSheet>
       )}

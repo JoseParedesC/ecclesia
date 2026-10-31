@@ -36,7 +36,7 @@ export default function MovementEdit({ kind }: { kind: "incomes" | "expenses" })
   const header = <PageHeader title={id ? `Editar ${label}` : `Nuevo ${label}`} actions={<Button variant="ghost" onClick={back}><ArrowLeft className="h-4 w-4" aria-hidden="true" />Volver al listado</Button>} />;
 
   if (error) return <>{header}<Alert tone="error">{error}</Alert></>;
-  if (!types || !periods) return <>{header}<div className="flex justify-center py-16 text-primary"><Spinner className="h-6 w-6" /></div></>;
+  if (!types || !periods) return <>{header}<div className="flex justify-center py-16 text-primary_"><Spinner className="h-6 w-6" /></div></>;
 
   // Fechas permitidas: desde el primer día del primer período abierto hasta el último día del último
   const open = periods.filter((p) => p.status === "OPEN").sort((a, b) => a.year * 12 + a.month - (b.year * 12 + b.month));

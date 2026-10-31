@@ -8,7 +8,7 @@ export default function Login() {
   return (
     <div className="relative grid min-h-screen place-items-center p-4">
       <div className="absolute right-4 top-4"><ThemeToggle /></div>
-      <Card className="w-full max-w-sm animate-scale-in shadow-card">
+      <Card className="w-full max-w-sm animate-scale-in border-t-4 border-t-primary shadow-card">
         <CardBody className="flex flex-col gap-5 p-7">
           <Brand />
           <div>

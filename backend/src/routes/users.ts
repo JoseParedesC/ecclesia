@@ -19,6 +19,12 @@ usersRouter.get("/", async (req, res) => {
   res.json(rows);
 });
 
+usersRouter.get("/:id", async (req, res) => {
+  const { rows } = await pool.query(`SELECT ${COLS} FROM users WHERE id = $1 AND role = ANY($2::user_role[])`, [Number(req.params.id), allowedFor(req)]);
+  if (!rows[0]) throw new HttpError(404, "Usuario no encontrado.");
+  res.json(rows[0]);
+});
+
 usersRouter.post("/", async (req, res) => {
   const b = z.object({ email: z.string().trim().toLowerCase().email(), name: z.string().trim().max(120).nullish(), role }).parse(req.body);
   if (!allowedFor(req).includes(b.role)) throw new HttpError(403, `Tu rol no puede crear usuarios con el rol ${b.role}.`);
@@ -36,10 +42,11 @@ usersRouter.patch("/:id", async (req, res) => {
   if (b.role && !allowed.includes(b.role)) throw new HttpError(403, `Tu rol no puede asignar el rol ${b.role}.`);
   if (id === req.user!.id && (b.active === false || (b.role && b.role !== target.role)))
     throw new HttpError(409, "No puedes cambiar tu propio rol ni desactivarte.");
+  const nameSent = Object.prototype.hasOwnProperty.call(req.body, "name"); // permite dejar el nombre vacío
   const { rows } = await pool.query(
-    `UPDATE users SET name = COALESCE($2, name), role = COALESCE($3, role), active = COALESCE($4, active)
+    `UPDATE users SET name = CASE WHEN $5 THEN $2 ELSE name END, role = COALESCE($3, role), active = COALESCE($4, active)
      WHERE id = $1 RETURNING ${COLS}`,
-    [id, b.name ?? null, b.role ?? null, b.active ?? null],
+    [id, b.name || null, b.role ?? null, b.active ?? null, nameSent],
   );
   res.json(rows[0]);
 });

@@ -8,12 +8,13 @@ import MovementEdit from "./pages/MovementEdit";
 import Movements from "./pages/Movements";
 import Periods from "./pages/Periods";
 import Reports from "./pages/Reports";
+import UserEdit from "./pages/UserEdit";
 import Users from "./pages/Users";
 import { ThemeProvider } from "./theme/ThemeProvider";
 
 function Gate() {
   const { me, loading } = useAuth();
-  if (loading) return <div className="grid min-h-screen place-items-center text-primary"><Spinner className="h-7 w-7" /></div>;
+  if (loading) return <div className="grid min-h-screen place-items-center text-primary_"><Spinner className="h-7 w-7" /></div>;
   if (!me) return <Login />;
   return (
     <Routes>
@@ -27,7 +28,15 @@ function Gate() {
         <Route path="/expenses/:id/edit" element={<MovementEdit kind="expenses" />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/masters" element={<Masters />} />
-        <Route path="/users" element={me.creatableRoles.length > 0 ? <Users /> : <Navigate to="/periods" replace />} />
+        {me.creatableRoles.length > 0 ? (
+          <>
+            <Route path="/users" element={<Users />} />
+            <Route path="/users/new" element={<UserEdit />} />
+            <Route path="/users/:id/edit" element={<UserEdit />} />
+          </>
+        ) : (
+          <Route path="/users/*" element={<Navigate to="/periods" replace />} />
+        )}
         <Route path="*" element={<Navigate to="/periods" replace />} />
       </Route>
     </Routes>

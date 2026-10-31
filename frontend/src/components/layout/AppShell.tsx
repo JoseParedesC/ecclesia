@@ -22,8 +22,11 @@ function NavItem({ to, label, Icon }: Omit<(typeof nav)[number], "needsUsers">) 
       to={to}
       className={({ isActive }) =>
         cn(
-          "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-fast ease-standard",
-          isActive ? "bg-primary-soft text-primary" : "text-muted hover:bg-mist hover:text-ink",
+          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-fast ease-standard",
+          "relative",
+          isActive
+            ? "bg-primary-soft text-primary_ shadow-soft before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-full before:bg-primary_ before:content-['']"
+            : "text-muted hover:bg-mist hover:text-ink",
         )
       }
     >
@@ -47,7 +50,7 @@ export function AppShell() {
       />
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 print:hidden flex w-[16.5rem] flex-col gap-6 border-r border-line bg-surface p-4 shadow-card",
+          "fixed inset-y-0 left-0 z-40 print:hidden flex w-[16.5rem] flex-col gap-6 border-r border-line bg-surface/95 p-4 shadow-card backdrop-blur",
           "transition-transform duration-slow ease-standard lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shadow-none",
           open ? "translate-x-0" : "-translate-x-full",
         )}
@@ -57,7 +60,7 @@ export function AppShell() {
           <button aria-label="Cerrar menú" onClick={() => setOpen(false)} className="rounded p-1 text-muted hover:bg-mist lg:hidden"><X className="h-5 w-5" /></button>
         </div>
         <nav aria-label="Principal" className="flex flex-col gap-1">{nav.filter((n) => !n.needsUsers || (me?.creatableRoles.length ?? 0) > 0).map(({ needsUsers: _u, ...n }) => <NavItem key={n.to} {...n} />)}</nav>
-        <div className="mt-auto flex flex-col gap-3 rounded-lg bg-mist/70 p-3">
+        <div className="mt-auto flex flex-col gap-3 rounded-xl border border-line bg-mist/70 p-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{me?.name ?? me?.email}</p>
             <p className="truncate text-xs text-muted">{me?.email}</p>
@@ -68,7 +71,7 @@ export function AppShell() {
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-20 print:hidden flex items-center justify-between gap-3 border-b border-line bg-bg/85 px-4 py-3 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-20 print:hidden flex items-center justify-between gap-3 border-b border-line bg-bg/80 px-4 py-3 shadow-soft backdrop-blur-md sm:px-6">
           <button aria-label="Abrir menú" onClick={() => setOpen(true)} className="rounded-md p-1.5 text-ink hover:bg-mist lg:hidden"><Menu className="h-5 w-5" /></button>
           <span className="hidden lg:block" />
           <ThemeToggle />

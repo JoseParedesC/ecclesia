@@ -1,15 +1,12 @@
-import { Users } from "lucide-react";
-import { Badge, Button, EmptyState, Table, TableWrap, Td, Th, Tr, controlClass } from "../../components/ui";
-import type { Role, UserRow } from "../../types";
-import { ROLES } from "./UserForm";
+import { Pencil, Users } from "lucide-react";
+import { Badge, Button, EmptyState, Table, TableWrap, Td, Th, Tr } from "../../components/ui";
+import type { UserRow } from "../../types";
+import { roleLabel } from "./UserForm";
 
-interface Props {
-  users: UserRow[]; allowed: Role[]; meId: number; busyId: number | null;
-  onRole: (u: UserRow, role: Role) => void; onToggle: (u: UserRow) => void;
-}
+interface Props { users: UserRow[]; meId: number; busyId: number | null; onEdit: (u: UserRow) => void; onToggle: (u: UserRow) => void }
 
-export function UsersTable({ users, allowed, meId, busyId, onRole, onToggle }: Props) {
-  if (!users.length) return <TableWrap><EmptyState icon={Users} title="Sin usuarios" /></TableWrap>;
+export function UsersTable({ users, meId, busyId, onEdit, onToggle }: Props) {
+  if (!users.length) return <TableWrap><EmptyState icon={Users} title="Sin usuarios">No hay usuarios para la búsqueda elegida.</EmptyState></TableWrap>;
   return (
     <TableWrap>
       <Table>
@@ -23,20 +20,12 @@ export function UsersTable({ users, allowed, meId, busyId, onRole, onToggle }: P
                   <p className="font-medium">{u.name ?? u.email}{self && <span className="ml-2 text-xs text-muted">(tú)</span>}</p>
                   {u.name && <p className="text-xs text-muted">{u.email}</p>}
                 </Td>
-                <Td>
-                  <select
-                    aria-label={`Rol de ${u.email}`} value={u.role} disabled={self || busyId === u.id}
-                    onChange={(e) => onRole(u, e.target.value as Role)} className={`${controlClass} w-40 py-1.5`}
-                  >
-                    {ROLES.filter((r) => allowed.includes(r.value)).map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
-                  </select>
-                </Td>
+                <Td><Badge tone="primary">{roleLabel(u.role)}</Badge></Td>
                 <Td><Badge tone={u.active ? "success" : "neutral"}>{u.active ? "Activo" : "Inactivo"}</Badge></Td>
                 <Td>
-                  <div className="flex justify-end">
-                    <Button size="sm" variant="ghost" disabled={self} loading={busyId === u.id} onClick={() => onToggle(u)}>
-                      {u.active ? "Desactivar" : "Activar"}
-                    </Button>
+                  <div className="flex justify-end gap-1">
+                    <Button size="sm" variant="ghost" aria-label={`Editar ${u.email}`} onClick={() => onEdit(u)}><Pencil className="h-3.5 w-3.5" /></Button>
+                    <Button size="sm" variant="ghost" disabled={self} loading={busyId === u.id} onClick={() => onToggle(u)}>{u.active ? "Desactivar" : "Activar"}</Button>
                   </div>
                 </Td>
               </Tr>

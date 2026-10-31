@@ -32,13 +32,17 @@
 - [x] Módulo de Reportes imprimibles: ingresos y egresos (fechas/categoría/tipo), intenciones por rango de fechas, consolidado mensual
 - [x] Pantalla de Períodos (abrir, cerrar, reabrir según rol, resumen, descargar consolidado)
 - [x] Ingresos y Egresos funcionan como los maestros: **listado** (`/incomes`, `/expenses`) con período, búsqueda con retardo, filtro por tipo y botón «Nuevo»; **formulario** en pantalla aparte (`/…/new`, `/…/:id/edit`) con campos condicionales de intención y bloque «Responsable» con validación en cliente
-- [x] Pantalla de Usuarios (según rol): agregar, cambiar rol, activar/desactivar
+- [x] Usuarios (según rol) con listado y formulario aparte: `/users` (búsqueda, filtros por rol y estado, editar, activar/desactivar) y `/users/new`, `/users/:id/edit` (correo fijo al editar, nombre y rol; nadie cambia su propio rol); `GET /users/:id` en el backend
 - [x] Pantalla de Maestros con `@joseparedesc/master-crud` (campo cuenta contable solo para contador y administrador)
 - [x] Tailwind configurado con los tokens que exige el paquete de maestros
 - [x] Archivo central de estilos (`theme.tokens.json`) y tema claro/oscuro/sistema; paleta clara dorada/crema (primario `#D4AF37`, variantes `primary_` en `#B88A24`; el tema oscuro hereda sus equivalentes)
+- [x] Estilo profesional unificado: tarjetas y tablas con bordes redondeados y encabezados en versalitas, botones primarios con degradado dorado, insignias con punto, alertas con acento lateral, menú lateral con indicador de sección activa, fondo con halos suaves, barras de desplazamiento finas; texto de acento sobre fondo claro usa `primary_` para mejor contraste
+- [x] Regla del proyecto: todo CRUD tiene listado y formulario en pantallas aparte (maestros, ingresos, egresos, usuarios)
 - [x] Jerarquía ui → layout → features → pages, con transiciones suaves, toasts y diálogos de confirmación
 
 ## ⏳ Pendiente
+
+- [ ] Compilar y probar Usuarios (listado/formulario) y el nuevo estilo en el navegador, en claro y oscuro (aquí solo se revisó la sintaxis)
 
 - [ ] Revisar contraste de la paleta clara: texto blanco sobre `#D4AF37` queda bajo (~2:1); valorar usar `primary_` (`#B88A24`) o tinta oscura en botones primarios
 
