@@ -4,6 +4,7 @@ import { AppShell } from "./components/layout/AppShell";
 import { ConfirmProvider, Spinner, ToastProvider } from "./components/ui";
 import Login from "./pages/Login";
 import Masters from "./pages/Masters";
+import MovementEdit from "./pages/MovementEdit";
 import Movements from "./pages/Movements";
 import Periods from "./pages/Periods";
 import Reports from "./pages/Reports";
@@ -19,7 +20,11 @@ function Gate() {
       <Route element={<AppShell />}>
         <Route path="/periods" element={<Periods />} />
         <Route path="/incomes" element={<Movements kind="incomes" />} />
+        <Route path="/incomes/new" element={<MovementEdit kind="incomes" />} />
+        <Route path="/incomes/:id/edit" element={<MovementEdit kind="incomes" />} />
         <Route path="/expenses" element={<Movements kind="expenses" />} />
+        <Route path="/expenses/new" element={<MovementEdit kind="expenses" />} />
+        <Route path="/expenses/:id/edit" element={<MovementEdit kind="expenses" />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/masters" element={<Masters />} />
         <Route path="/users" element={me.creatableRoles.length > 0 ? <Users /> : <Navigate to="/periods" replace />} />

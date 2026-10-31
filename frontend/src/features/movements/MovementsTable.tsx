@@ -7,13 +7,13 @@ interface Props { rows: Movement[]; isIncome: boolean; onEdit: (m: Movement) => 
 
 export function MovementsTable({ rows, isIncome, onEdit, onDelete }: Props) {
   if (!rows.length)
-    return <TableWrap><EmptyState icon={ReceiptText} title="Sin registros en este período">Los movimientos que registres aparecerán aquí.</EmptyState></TableWrap>;
+    return <TableWrap><EmptyState icon={ReceiptText} title="Sin registros">No hay movimientos para el período y la búsqueda elegidos.</EmptyState></TableWrap>;
   return (
     <TableWrap>
       <Table>
         <thead>
           <tr>
-            <Th>Fecha</Th><Th>Tipo</Th>{isIncome && <Th>Se realiza</Th>}<Th>Descripción</Th><Th className="text-right">Monto</Th><Th><span className="sr-only">Acciones</span></Th>
+            <Th>Fecha</Th><Th>Tipo</Th>{isIncome && <Th>Se realiza</Th>}<Th>Responsable</Th><Th>Contacto</Th><Th>Descripción</Th><Th className="text-right">Monto</Th><Th><span className="sr-only">Acciones</span></Th>
           </tr>
         </thead>
         <tbody>
@@ -25,6 +25,15 @@ export function MovementsTable({ rows, isIncome, onEdit, onDelete }: Props) {
                 <Badge tone={m.categoryCode === "INTENCION" ? "primary" : "neutral"}>{m.categoryName}</Badge>
               </Td>
               {isIncome && <Td className="whitespace-nowrap tabular-nums">{m.intentionDate ?? "—"}</Td>}
+              <Td>
+                <p className="font-medium">{m.responsible ?? "—"}</p>
+                {m.idType && <p className="whitespace-nowrap text-xs text-muted">{m.idType} {m.idNumber}</p>}
+              </Td>
+              <Td className="text-muted">
+                <p className="whitespace-nowrap">{m.phone ?? "—"}</p>
+                {m.email && <p className="text-xs">{m.email}</p>}
+                {m.address && <p className="max-w-[12rem] text-xs">{m.address}</p>}
+              </Td>
               <Td className="max-w-xs text-muted">{m.description ?? "—"}</Td>
               <Td className="whitespace-nowrap text-right font-medium tabular-nums">{money(m.amount)}</Td>
               <Td>

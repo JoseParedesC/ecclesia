@@ -99,6 +99,23 @@ CREATE TABLE IF NOT EXISTS expenses (
 );
 CREATE INDEX IF NOT EXISTS expenses_period ON expenses(period_id);
 
+-- Datos del responsable de cada ingreso/egreso (quien entrega o recibe el dinero).
+-- Se agregan como columnas nulas para no romper filas anteriores; la API los exige en registros nuevos y en ediciones.
+ALTER TABLE incomes  ADD COLUMN IF NOT EXISTS responsible_name TEXT;
+ALTER TABLE incomes  ADD COLUMN IF NOT EXISTS address          TEXT;
+ALTER TABLE incomes  ADD COLUMN IF NOT EXISTS id_type          TEXT CHECK (id_type IN ('NIT','CC','TI'));
+ALTER TABLE incomes  ADD COLUMN IF NOT EXISTS id_number        TEXT;
+ALTER TABLE incomes  ADD COLUMN IF NOT EXISTS contact_phone    TEXT;
+ALTER TABLE incomes  ADD COLUMN IF NOT EXISTS email            TEXT;   -- opcional
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS responsible_name TEXT;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS address          TEXT;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS id_type          TEXT CHECK (id_type IN ('NIT','CC','TI'));
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS id_number        TEXT;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS contact_phone    TEXT;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS email            TEXT;   -- opcional
+CREATE INDEX IF NOT EXISTS incomes_responsible  ON incomes  (id_number);
+CREATE INDEX IF NOT EXISTS expenses_responsible ON expenses (id_number);
+
 -- Datos iniciales de ejemplo (editables desde la pantalla de Maestros)
 INSERT INTO income_types (code, name, category_id)
   SELECT 'INT-MISA', 'Intención de misa', id FROM income_categories WHERE code='INTENCION' ON CONFLICT DO NOTHING;

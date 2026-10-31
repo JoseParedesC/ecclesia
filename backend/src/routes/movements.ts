@@ -5,16 +5,20 @@ import { pool, tx } from "../db.js";
 import { HttpError } from "../errors.js";
 import { KINDS, type Kind } from "../kinds.js";
 import { requireOpenPeriodForDate } from "../services/periods.js";
+import { refineIdNumber, responsibleShape } from "../services/responsible.js";
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida (AAAA-MM-DD)");
 
-const bodySchema = z.object({
-  typeId: z.number().int().positive(),
-  date: isoDate,
-  amount: z.number().positive().multipleOf(0.01),
-  description: z.string().trim().max(1000).nullish(),
-  intentionDate: isoDate.nullish(),
-});
+const bodySchema = z
+  .object({
+    typeId: z.number().int().positive(),
+    date: isoDate,
+    amount: z.number().positive().multipleOf(0.01),
+    description: z.string().trim().max(1000).nullish(),
+    intentionDate: isoDate.nullish(),
+    ...responsibleShape,
+  })
+  .superRefine(refineIdNumber);
 
 export function movementsRouter(kind: Kind) {
   const k = KINDS[kind];
@@ -23,7 +27,9 @@ export function movementsRouter(kind: Kind) {
 
   const select = `SELECT m.id, m.${k.fk} AS "typeId", t.name AS "typeName", c.code AS "categoryCode",
       c.name AS "categoryName", t.account_code AS "accountCode", m.date, m.amount, m.description,
-      ${intentionSel} AS "intentionDate", m.period_id AS "periodId", p.status AS "periodStatus"
+      ${intentionSel} AS "intentionDate", m.period_id AS "periodId", p.status AS "periodStatus",
+      m.responsible_name AS "responsible", m.address, m.id_type AS "idType", m.id_number AS "idNumber",
+      m.contact_phone AS "phone", m.email
     FROM ${k.mov} m JOIN ${k.type} t ON t.id = m.${k.fk} JOIN ${k.cat} c ON c.id = t.category_id
     JOIN periods p ON p.id = m.period_id`;
 
@@ -53,13 +59,47 @@ export function movementsRouter(kind: Kind) {
     return rows[0] as { id: number; typeId: number };
   }
 
+  /** Columnas de la tabla de movimientos a partir del cuerpo validado (los nombres salen del código, no del cliente). */
+  function columns(b: z.infer<typeof bodySchema>, periodId: number, n: Awaited<ReturnType<typeof normalize>>) {
+    const data: Record<string, unknown> = {
+      [k.fk]: b.typeId,
+      period_id: periodId,
+      date: b.date,
+      amount: b.amount,
+      description: n.description,
+      responsible_name: b.responsible,
+      address: b.address,
+      id_type: b.idType,
+      id_number: b.idNumber,
+      contact_phone: b.phone,
+      email: b.email ?? null,
+    };
+    if (kind === "income") data.intention_date = n.intentionDate;
+    return data;
+  }
+
+  // Listado con búsqueda (responsable, identificación, tipo, descripción) y filtros por período y tipo
   r.get("/", async (req, res) => {
     const periodId = req.query.periodId ? Number(req.query.periodId) : null;
+    const typeId = req.query.typeId ? Number(req.query.typeId) : null;
+    const search = String(req.query.search ?? "").trim();
     const { rows } = await pool.query(
-      `${select} WHERE ($1::int IS NULL OR m.period_id = $1) ORDER BY m.date DESC, m.id DESC`,
-      [periodId],
+      `${select}
+        WHERE ($1::int IS NULL OR m.period_id = $1)
+          AND ($2::int IS NULL OR m.${k.fk} = $2)
+          AND ($3::text = '' OR m.responsible_name ILIKE '%' || $3 || '%' OR m.id_number ILIKE '%' || $3 || '%'
+               OR t.name ILIKE '%' || $3 || '%' OR m.description ILIKE '%' || $3 || '%')
+        ORDER BY m.date DESC, m.id DESC`,
+      [periodId, typeId, search],
     );
     res.json(rows);
+  });
+
+  // Detalle de un registro (lo usa la pantalla de edición)
+  r.get("/:id", async (req, res) => {
+    const { rows } = await pool.query(`${select} WHERE m.id = $1`, [Number(req.params.id)]);
+    if (!rows[0]) throw new HttpError(404, "Movimiento no encontrado.");
+    res.json(rows[0]);
   });
 
   r.post("/", async (req, res) => {
@@ -67,12 +107,11 @@ export function movementsRouter(kind: Kind) {
     const id = await tx(async (c) => {
       const periodId = await requireOpenPeriodForDate(c, b.date);
       const n = await normalize(c, b, true);
-      const cols = [k.fk, "period_id", "date", "amount", "description", "created_by"];
-      const vals: unknown[] = [b.typeId, periodId, b.date, b.amount, n.description, req.user!.id];
-      if (kind === "income") { cols.push("intention_date"); vals.push(n.intentionDate); }
+      const data = { ...columns(b, periodId, n), created_by: req.user!.id };
+      const cols = Object.keys(data);
       const { rows } = await c.query(
-        `INSERT INTO ${k.mov} (${cols.join(",")}) VALUES (${vals.map((_, i) => `$${i + 1}`).join(",")}) RETURNING id`,
-        vals,
+        `INSERT INTO ${k.mov} (${cols.join(",")}) VALUES (${cols.map((_, i) => `$${i + 1}`).join(",")}) RETURNING id`,
+        Object.values(data),
       );
       return rows[0].id as number;
     });
@@ -86,10 +125,12 @@ export function movementsRouter(kind: Kind) {
       const cur = await existing(c, id);
       const periodId = await requireOpenPeriodForDate(c, b.date);
       const n = await normalize(c, b, b.typeId !== cur.typeId);
-      const sets = [`${k.fk}=$2`, "period_id=$3", "date=$4", "amount=$5", "description=$6", "updated_at=now()"];
-      const vals: unknown[] = [id, b.typeId, periodId, b.date, b.amount, n.description];
-      if (kind === "income") { sets.push("intention_date=$7"); vals.push(n.intentionDate); }
-      await c.query(`UPDATE ${k.mov} SET ${sets.join(",")} WHERE id=$1`, vals);
+      const data = columns(b, periodId, n);
+      const cols = Object.keys(data);
+      await c.query(
+        `UPDATE ${k.mov} SET ${cols.map((col, i) => `${col}=$${i + 2}`).join(",")}, updated_at=now() WHERE id=$1`,
+        [id, ...Object.values(data)],
+      );
     });
     res.json((await pool.query(`${select} WHERE m.id = $1`, [id])).rows[0]);
   });

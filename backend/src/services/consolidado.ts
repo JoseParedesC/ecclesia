@@ -7,6 +7,7 @@ const r2 = (n: number) => Math.round(n * 100) / 100;
 interface Row {
   id: number; date: string; type: string; category: string; categoryName: string;
   account: string | null; intentionDate: string | null; description: string | null; amount: number;
+  responsible: string | null; idType: string | null; idNumber: string | null;
 }
 
 async function rowsFor(kind: Kind, periodId: number): Promise<Row[]> {
@@ -14,7 +15,8 @@ async function rowsFor(kind: Kind, periodId: number): Promise<Row[]> {
   const intention = kind === "income" ? "m.intention_date" : "NULL::date";
   const { rows } = await pool.query(
     `SELECT m.id, m.date, t.name AS type, c.code AS category, c.name AS "categoryName",
-            t.account_code AS account, ${intention} AS "intentionDate", m.description, m.amount
+            t.account_code AS account, ${intention} AS "intentionDate", m.description, m.amount,
+            m.responsible_name AS responsible, m.id_type AS "idType", m.id_number AS "idNumber"
        FROM ${k.mov} m JOIN ${k.type} t ON t.id = m.${k.fk} JOIN ${k.cat} c ON c.id = t.category_id
       WHERE m.period_id = $1 ORDER BY m.date, m.id`,
     [periodId],
@@ -50,11 +52,11 @@ const line = (...cells: unknown[]) => cells.map(esc).join(";");
 
 /** CSV con ';' y BOM (se abre bien en Excel en configuración regional en español). */
 export function consolidadoToCsv(d: Awaited<ReturnType<typeof buildConsolidado>>) {
-  const head = ["Fecha", "Tipo", "Categoría", "Cuenta contable", "Fecha intención", "Descripción", "Monto"];
+  const head = ["Fecha", "Tipo", "Categoría", "Cuenta contable", "Fecha intención", "Responsable", "Identificación", "Descripción", "Monto"];
   const body = (list: Row[]) =>
-    list.map((r) => line(r.date, r.type, r.categoryName, r.account, r.intentionDate, r.description, r.amount));
+    list.map((r) => line(r.date, r.type, r.categoryName, r.account, r.intentionDate, r.responsible, r.idType ? `${r.idType} ${r.idNumber ?? ""}`.trim() : "", r.description, r.amount));
   const t = d.totals;
-  const tot = (label: string, v: number) => line(label, "", "", "", "", "", v);
+  const tot = (label: string, v: number) => line(label, "", "", "", "", "", "", "", v);
   return [
     line(`Consolidado ${d.period.year}-${String(d.period.month).padStart(2, "0")}`, `Estado: ${d.period.status}`),
     "",

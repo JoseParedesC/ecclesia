@@ -39,7 +39,8 @@ reportsRouter.get("/movements", async (req, res) => {
   const intention = q.kind === "income" ? "m.intention_date" : "NULL::date";
   const { rows } = await pool.query(
     `SELECT m.id, m.date, t.name AS type, c.code AS category, c.name AS "categoryName",
-            t.account_code AS account, m.description, ${intention} AS "intentionDate", m.amount
+            t.account_code AS account, m.description, ${intention} AS "intentionDate", m.amount,
+            m.responsible_name AS responsible, m.id_type AS "idType", m.id_number AS "idNumber"
        FROM ${k.mov} m JOIN ${k.type} t ON t.id = m.${k.fk} JOIN ${k.cat} c ON c.id = t.category_id
       WHERE ($1::date IS NULL OR m.date >= $1) AND ($2::date IS NULL OR m.date <= $2)
         AND ($3::int IS NULL OR t.category_id = $3) AND ($4::int IS NULL OR m.${k.fk} = $4)

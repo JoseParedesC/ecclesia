@@ -8,6 +8,7 @@
 - [x] Maestros `income_types` y `expense_types` (código, nombre, categoría, cuenta contable, activo, auditoría)
 - [x] Tablas `periods`, `period_events` (auditoría de abrir/cerrar/reabrir), `incomes`, `expenses`, `users`
 - [x] Datos semilla de ejemplo
+- [x] Datos del responsable en `incomes` y `expenses`: `responsible_name`, `address`, `id_type` (NIT/CC/TI), `id_number`, `contact_phone`, `email` (opcional); columnas nulas para no romper filas anteriores (se agregan con `ALTER TABLE … IF NOT EXISTS`)
 
 ### Backend (probado contra PostgreSQL 16 con un arnés que simula el usuario)
 - [x] Autenticación: verificación de ID token de Firebase + usuario pre-registrado con rol
@@ -16,6 +17,9 @@
 - [x] API de maestros compatible con `createRestAdapter` (búsqueda, estado, referencias, 409 por uso)
 - [x] Cuenta contable editable solo por el contador (el resto de roles la ignora)
 - [x] Ingresos/egresos: CRUD con validación de período abierto
+- [x] Ingresos/egresos con responsable obligatorio (responsable, dirección, tipo y número de identificación, teléfono) y correo opcional; el NIT admite guion y dígito de verificación, CC y TI solo dígitos (`services/responsible.ts`)
+- [x] `GET /incomes|/expenses` con búsqueda (responsable, identificación, tipo, descripción) y filtros por período y tipo; `GET /:id` para la pantalla de edición
+- [x] Reportes de ingresos/egresos y CSV del consolidado incluyen responsable e identificación
 - [x] Intención: fecha de realización y descripción obligatorias
 - [x] Períodos: abrir, cerrar, reabrir; máx. 2 abiertos y consecutivos; reabrir negado al secretario
 - [x] Resumen por período y consolidado descargable (CSV)
@@ -27,14 +31,20 @@
 - [x] Login con Google (Firebase) y control de sesión
 - [x] Módulo de Reportes imprimibles: ingresos y egresos (fechas/categoría/tipo), intenciones por rango de fechas, consolidado mensual
 - [x] Pantalla de Períodos (abrir, cerrar, reabrir según rol, resumen, descargar consolidado)
-- [x] Pantalla de Ingresos y Egresos con campos condicionales de intención
+- [x] Ingresos y Egresos funcionan como los maestros: **listado** (`/incomes`, `/expenses`) con período, búsqueda con retardo, filtro por tipo y botón «Nuevo»; **formulario** en pantalla aparte (`/…/new`, `/…/:id/edit`) con campos condicionales de intención y bloque «Responsable» con validación en cliente
 - [x] Pantalla de Usuarios (según rol): agregar, cambiar rol, activar/desactivar
 - [x] Pantalla de Maestros con `@joseparedesc/master-crud` (campo cuenta contable solo para contador y administrador)
 - [x] Tailwind configurado con los tokens que exige el paquete de maestros
-- [x] Archivo central de estilos (`theme.tokens.json`) y tema claro/oscuro/sistema
+- [x] Archivo central de estilos (`theme.tokens.json`) y tema claro/oscuro/sistema; paleta clara dorada/crema (primario `#D4AF37`, variantes `primary_` en `#B88A24`; el tema oscuro hereda sus equivalentes)
 - [x] Jerarquía ui → layout → features → pages, con transiciones suaves, toasts y diálogos de confirmación
 
 ## ⏳ Pendiente
+
+- [ ] Revisar contraste de la paleta clara: texto blanco sobre `#D4AF37` queda bajo (~2:1); valorar usar `primary_` (`#B88A24`) o tinta oscura en botones primarios
+
+- [ ] **Compilar y probar lo nuevo de ingresos/egresos**: en el entorno donde se hicieron estos cambios no había red ni PostgreSQL, así que solo se revisó la sintaxis con `tsc`; falta correr `npm install`, `npm run typecheck`, `npm run build` (backend y frontend) y probar crear/editar/buscar/eliminar contra la base
+- [ ] Completar el responsable en los registros anteriores a esta versión (quedan con esas columnas vacías y al editarlos se exigirán los datos); decidir si se hace una carga masiva o se deja manual
+- [ ] Decidir si el responsable debe ser un maestro/catálogo de terceros reutilizable (hoy se escribe en cada movimiento)
 
 - [ ] Revisar visualmente la UI en el navegador (claro y oscuro, móvil y escritorio); aquí solo se verificó que compila y que el CSS se genera
 - [ ] Probar el login real con Firebase (proyecto, dominio autorizado, credenciales Admin)

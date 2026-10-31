@@ -36,7 +36,17 @@ Cada rol solo ve y gestiona (cambiar rol, activar/desactivar) los roles que pued
 | Reabrir: solo sacerdote, contador, administrador | `auth.ts` → `REOPEN_ROLES` |
 | Solo se registra/edita/borra en períodos abiertos; el período sale de la fecha | `routes/movements.ts` |
 | Cuenta contable de maestros: la definen el contador y el administrador | `routes/masters.ts` + `masterConfigs.ts` |
+| Ingreso/egreso exige responsable, dirección, tipo (NIT, CC o TI) y número de identificación, teléfono de contacto; correo opcional | `services/responsible.ts` + `MovementForm.tsx` |
 | Consolidado mensual (CSV, separador `;`, con BOM para Excel) | `services/consolidado.ts` |
+
+## Ingresos y egresos (listado y formulario separados)
+
+Igual que los maestros, cada módulo tiene dos pantallas:
+
+- **Listado** (`/incomes`, `/expenses`): período, búsqueda (responsable, identificación, tipo o descripción), filtro por tipo, editar y eliminar solo en períodos abiertos, y el botón **Nuevo**.
+- **Formulario** (`/incomes/new`, `/incomes/:id/edit` y lo equivalente en `/expenses`): datos del movimiento y bloque **Responsable** (responsable, dirección, tipo y número de identificación [NIT | CC | TI], teléfono de contacto y correo opcional). Al guardar vuelve al listado. La fecha solo admite días dentro de los períodos abiertos.
+
+Los registros creados antes de esta versión no tienen responsable; al editarlos se pedirá.
 
 ## Reportes e impresión
 
