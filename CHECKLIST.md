@@ -3,8 +3,9 @@
 ## ✅ Implementado
 
 ### Base de datos
+- [x] **v1.1** Categoría «Intención» renombrada a «Estipendio» (migración automática, conserva datos) y columna `income_types.default_amount` (valor sugerido)
 - [x] Esquema PostgreSQL idempotente (`backend/db/schema.sql`) y script `npm run migrate`
-- [x] Categorías en tablas (`income_categories`, `expense_categories`) con INTENCION/DONACION y SERVICIO/GASTO
+- [x] Categorías en tablas (`income_categories`, `expense_categories`) con ESTIPENDIO/DONACION y SERVICIO/GASTO
 - [x] Maestros `income_types` y `expense_types` (código, nombre, categoría, cuenta contable, activo, auditoría)
 - [x] Tablas `periods`, `period_events` (auditoría de abrir/cerrar/reabrir), `incomes`, `expenses`, `users`
 - [x] Datos semilla de ejemplo
@@ -20,18 +21,18 @@
 - [x] Ingresos/egresos con responsable obligatorio (responsable, dirección, tipo y número de identificación, teléfono) y correo opcional; el NIT admite guion y dígito de verificación, CC y TI solo dígitos (`services/responsible.ts`)
 - [x] `GET /incomes|/expenses` con búsqueda (responsable, identificación, tipo, descripción) y filtros por período y tipo; `GET /:id` para la pantalla de edición
 - [x] Reportes de ingresos/egresos y CSV del consolidado incluyen responsable e identificación
-- [x] Intención: fecha de realización y descripción obligatorias
+- [x] Estipendio: fecha de realización y descripción obligatorias
 - [x] Períodos: abrir, cerrar, reabrir; máx. 2 abiertos y consecutivos; reabrir negado al secretario
 - [x] Resumen por período y consolidado descargable (CSV)
-- [x] Endpoints de reportes: movimientos filtrados, intenciones y consolidado en JSON
+- [x] Endpoints de reportes: movimientos filtrados, estipendios y consolidado en JSON
 - [x] Gestión de usuarios por API con permisos por rol (admin: todos; sacerdote: contador y secretario; secretario: secretario; contador: ninguno)
 - [x] Cuenta contable editable por contador y administrador
 
 ### Frontend (compila con `tsc` y `vite build`)
 - [x] Login con Google (Firebase) y control de sesión
-- [x] Módulo de Reportes imprimibles: ingresos y egresos (fechas/categoría/tipo), intenciones por rango de fechas, consolidado mensual
+- [x] Módulo de Reportes imprimibles: ingresos y egresos (fechas/categoría/tipo), estipendios por rango de fechas, consolidado mensual
 - [x] Pantalla de Períodos (abrir, cerrar, reabrir según rol, resumen, descargar consolidado)
-- [x] Ingresos y Egresos funcionan como los maestros: **listado** (`/incomes`, `/expenses`) con período, búsqueda con retardo, filtro por tipo y botón «Nuevo»; **formulario** en pantalla aparte (`/…/new`, `/…/:id/edit`) con campos condicionales de intención y bloque «Responsable» con validación en cliente
+- [x] Ingresos y Egresos funcionan como los maestros: **listado** (`/incomes`, `/expenses`) con período, búsqueda con retardo, filtro por tipo y botón «Nuevo»; **formulario** en pantalla aparte (`/…/new`, `/…/:id/edit`) con campos condicionales de estipendio y bloque «Responsable» con validación en cliente
 - [x] Usuarios (según rol) con listado y formulario aparte: `/users` (búsqueda, filtros por rol y estado, editar, activar/desactivar) y `/users/new`, `/users/:id/edit` (correo fijo al editar, nombre y rol; nadie cambia su propio rol); `GET /users/:id` en el backend
 - [x] Pantalla de Maestros con `@joseparedesc/master-crud` (campo cuenta contable solo para contador y administrador)
 - [x] Tailwind configurado con los tokens que exige el paquete de maestros
@@ -42,6 +43,12 @@
 - [x] Opción «How to use» al pie del menú lateral que lleva al manual de usuario (`/manual`, `pages/Manual.tsx`); el mismo contenido está en `docs/MANUAL_USUARIO.md`
 - [x] Regla del proyecto: todo CRUD tiene listado y formulario en pantallas aparte (maestros, ingresos, egresos, usuarios)
 - [x] Jerarquía ui → layout → features → pages, con transiciones suaves, toasts y diálogos de confirmación
+
+### v1.1.0
+- [x] Valor sugerido por tipo de estipendio: panel en Maestros → Ingresos y precarga del monto al crear un ingreso (editable)
+- [x] Campos de valor con símbolo `$`, separadores de miles y alineados a la derecha (`MoneyInput`)
+- [x] Reportes y resúmenes renombrados a «Estipendios»; endpoint `/api/reports/stipends`
+- [x] Versión visible en la barra lateral (`package.json` → `__APP_VERSION__`)
 
 ## ⏳ Pendiente
 
@@ -70,3 +77,4 @@
 - [ ] Despliegue: Dockerfiles, CI, variables de producción, HTTPS, CORS restrictivo
 - [ ] Paginación en listados de movimientos
 - [ ] Confirmar con el cliente los supuestos del README (quién puede cerrar, quién edita maestros, moneda)
+- [ ] Valor sugerido dentro del formulario de maestros (hoy es un panel aparte porque `@joseparedesc/master-crud` no admite campos con formato de moneda)

@@ -8,12 +8,12 @@ export const controlClass = cn(
   "disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger",
 );
 
-interface Shared { label: string; hint?: string; error?: string }
+export interface Shared { label: string; hint?: string; error?: string; hideLabel?: boolean }
 
-function Shell({ label, hint, error, id, className, children }: Shared & { id: string; className?: string; children: ReactNode }) {
+export function Shell({ label, hint, error, hideLabel, id, className, children }: Shared & { id: string; className?: string; children: ReactNode }) {
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</label>
+      <label htmlFor={id} className={hideLabel ? "sr-only" : "text-xs font-semibold uppercase tracking-wide text-muted"}>{label}</label>
       {children}
       {error ? <p className="animate-slide-down text-xs text-danger">{error}</p> : hint ? <p className="text-xs text-muted">{hint}</p> : null}
     </div>

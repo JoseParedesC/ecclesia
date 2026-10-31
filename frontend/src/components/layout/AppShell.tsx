@@ -57,6 +57,7 @@ export function AppShell() {
             <div className="mt-1.5"><Badge tone="primary"><span className="capitalize">{me?.role}</span></Badge></div>
           </div>
           <Button size="sm" variant="secondary" onClick={logout}><LogOut className="h-3.5 w-3.5" aria-hidden="true" />Cerrar sesión</Button>
+          <p className="text-center text-xs text-muted">Ecclesia v{__APP_VERSION__}</p>
         </div>
         </div>
       </aside>

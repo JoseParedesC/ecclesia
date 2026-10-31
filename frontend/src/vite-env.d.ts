@@ -1,1 +1,4 @@
 /// <reference types="vite/client" />
+
+/** Versión del proyecto (frontend/package.json), inyectada por Vite al compilar. */
+declare const __APP_VERSION__: string;

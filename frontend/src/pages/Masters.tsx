@@ -5,6 +5,7 @@ import { useAuth } from "../auth";
 import { buildMasterConfig } from "../masterConfigs";
 import { PageHeader } from "../components/layout/PageHeader";
 import { Spinner, Tabs } from "../components/ui";
+import { StipendDefaultsPanel } from "../features/masters/StipendDefaultsPanel";
 import type { Category, TypeRow } from "../types";
 
 function MasterTab({ kind }: { kind: "income" | "expense" }) {
@@ -35,11 +36,14 @@ export default function Masters() {
   const [kind, setKind] = useState<"income" | "expense">("income");
   return (
     <>
-      <PageHeader title="Maestros" description="Tipos de ingreso y de egreso con su categoría. La cuenta contable la definen el contador y el administrador." />
+      <PageHeader title="Maestros" description="Tipos de ingreso y de egreso con su categoría. La cuenta contable la definen el contador y el administrador; el valor sugerido de los estipendios se configura debajo de la tabla." />
       <div className="mb-5">
         <Tabs value={kind} onChange={setKind} items={[{ value: "income", label: "Ingresos" }, { value: "expense", label: "Egresos" }]} />
       </div>
-      <div className="animate-fade-in" key={kind}><MasterTab kind={kind} /></div>
+      <div className="animate-fade-in" key={kind}>
+        <MasterTab kind={kind} />
+        {kind === "income" && <StipendDefaultsPanel />}
+      </div>
     </>
   );
 }

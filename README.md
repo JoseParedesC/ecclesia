@@ -1,4 +1,4 @@
-# Ecclesia
+# Ecclesia · v1.1.0
 
 _Finanzas parroquiales_
 
@@ -30,8 +30,10 @@ Cada rol solo ve y gestiona (cambiar rol, activar/desactivar) los roles que pued
 
 | Regla | Dónde |
 |---|---|
-| Categorías en BD: ingreso = `INTENCION`/`DONACION`, egreso = `SERVICIO`/`GASTO` | `backend/db/schema.sql` |
-| Intención exige fecha de realización + descripción (mención/petición) | `routes/movements.ts` y formulario |
+| Categorías en BD: ingreso = `ESTIPENDIO`/`DONACION`, egreso = `SERVICIO`/`GASTO` | `backend/db/schema.sql` |
+| Estipendio exige fecha de realización de la intención + descripción (mención/petición) | `routes/movements.ts` y formulario |
+| Valor sugerido por tipo de estipendio: se propone al crear un ingreso y se puede modificar | `routes/masters.ts` (`PATCH /:id/default-amount`), `StipendDefaultsPanel.tsx`, `MovementForm.tsx` |
+| Campos de valor con símbolo `$`, separadores de miles y alineados a la derecha | `components/ui/MoneyInput.tsx`, `format.ts` |
 | Máx. 2 períodos abiertos y consecutivos (al abrir y al reabrir) | `services/periods.ts` (con lock transaccional) |
 | Reabrir: solo sacerdote, contador, administrador | `auth.ts` → `REOPEN_ROLES` |
 | Solo se registra/edita/borra en períodos abiertos; el período sale de la fecha | `routes/movements.ts` |
@@ -64,7 +66,7 @@ Mismo patrón de dos pantallas: listado `/users` (búsqueda, filtros por rol y e
 
 ## Reportes e impresión
 
-Sección **Reportes** (todos los roles): ingresos y egresos (rango de fechas, categoría y tipo), intenciones (por fecha de realización o de registro) y consolidado mensual (también en CSV). El botón **Imprimir** abre el diálogo del navegador (ahí se puede elegir "Guardar como PDF"); solo se imprime la hoja del reporte, siempre en colores claros.
+Sección **Reportes** (todos los roles): ingresos y egresos (rango de fechas, categoría y tipo), estipendios (por fecha de realización de la intención o de registro) y consolidado mensual (también en CSV). El botón **Imprimir** abre el diálogo del navegador (ahí se puede elegir "Guardar como PDF"); solo se imprime la hoja del reporte, siempre en colores claros.
 
 ## Supuestos que conviene validar
 

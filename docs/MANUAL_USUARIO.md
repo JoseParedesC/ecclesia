@@ -41,7 +41,9 @@ Cada módulo tiene **dos pantallas**: el listado y el formulario.
 ### Formulario
 **Datos del movimiento:** tipo, fecha (dentro de un período abierto), monto y descripción.
 
-- Si el tipo es una **intención**, también son obligatorios la **fecha en que se realizará** y la **mención o petición**.
+- Si el tipo es un **estipendio**, también son obligatorios la **fecha en que se realizará** la intención y la **mención o petición**.
+- Si el tipo tiene un **valor sugerido**, el monto aparece ya escrito al elegirlo y puedes cambiarlo.
+- Los montos se escriben con el símbolo **$** y separadores de miles, alineados a la derecha; usa la coma (o el punto del teclado numérico) para los centavos.
 
 **Responsable** (quien entrega el dinero en un ingreso, o a quien se le paga en un egreso):
 
@@ -58,10 +60,11 @@ Al guardar vuelves al listado.
 
 ## 5. Maestros
 
-En **Maestros** se administran los **tipos de ingreso** y **tipos de egreso**: código, nombre, categoría (ingreso: Intención o Donación; egreso: Servicio o Gasto) y cuenta contable.
+En **Maestros** se administran los **tipos de ingreso** y **tipos de egreso**: código, nombre, categoría (ingreso: Estipendio o Donación; egreso: Servicio o Gasto) y cuenta contable.
 
 - Solo sacerdote, contador y administrador pueden crear o editar.
 - La **cuenta contable** solo la definen el contador y el administrador.
+- El **valor sugerido** de cada tipo de estipendio se configura en el panel debajo de la tabla de ingresos (lo editan sacerdote, contador y administrador); vacío = sin sugerencia.
 - Un tipo con movimientos no se puede eliminar ni cambiar de código o categoría; puedes **desactivarlo**.
 
 ## 6. Reportes
@@ -69,7 +72,7 @@ En **Maestros** se administran los **tipos de ingreso** y **tipos de egreso**: c
 En **Reportes** elige el filtro y pulsa generar:
 
 - **Ingresos / Egresos:** rango de fechas, categoría y tipo. Incluye responsable e identificación.
-- **Intenciones:** por fecha de realización o de registro.
+- **Estipendios:** por fecha de realización de la intención o de registro.
 - **Consolidado mensual:** ingresos, egresos y saldo del período.
 
 Con **Imprimir** se abre el diálogo del navegador; ahí puedes elegir **Guardar como PDF**.

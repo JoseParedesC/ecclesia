@@ -21,7 +21,10 @@ CREATE TABLE IF NOT EXISTS income_categories (
 CREATE TABLE IF NOT EXISTS expense_categories (
   id SERIAL PRIMARY KEY, code TEXT NOT NULL UNIQUE, name TEXT NOT NULL
 );
-INSERT INTO income_categories (code, name) VALUES ('INTENCION','Intención'),('DONACION','Donación') ON CONFLICT DO NOTHING;
+-- v1.1: la categoría "Intención" pasa a llamarse "Estipendio" (conserva su id, así que los tipos y movimientos existentes no cambian)
+UPDATE income_categories SET code = 'ESTIPENDIO', name = 'Estipendio'
+ WHERE code = 'INTENCION' AND NOT EXISTS (SELECT 1 FROM income_categories WHERE code = 'ESTIPENDIO');
+INSERT INTO income_categories (code, name) VALUES ('ESTIPENDIO','Estipendio'),('DONACION','Donación') ON CONFLICT DO NOTHING;
 INSERT INTO expense_categories (code, name) VALUES ('SERVICIO','Servicio'),('GASTO','Gasto') ON CONFLICT DO NOTHING;
 
 -- Maestros
@@ -37,6 +40,8 @@ CREATE TABLE IF NOT EXISTS income_types (
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- v1.1: valor sugerido para los tipos de la categoría Estipendio (se propone al crear un ingreso; el usuario puede cambiarlo)
+ALTER TABLE income_types ADD COLUMN IF NOT EXISTS default_amount NUMERIC(14,2) CHECK (default_amount IS NULL OR default_amount > 0);
 CREATE TABLE IF NOT EXISTS expense_types (
   id           SERIAL PRIMARY KEY,
   code         TEXT NOT NULL UNIQUE,
@@ -78,8 +83,8 @@ CREATE TABLE IF NOT EXISTS incomes (
   period_id      INT NOT NULL REFERENCES periods(id),
   date           DATE NOT NULL,
   amount         NUMERIC(14,2) NOT NULL CHECK (amount > 0),
-  intention_date DATE,                      -- solo para categoría INTENCION
-  description    TEXT,                      -- mención / petición en intenciones
+  intention_date DATE,                      -- fecha en que se realiza la intención; solo para categoría ESTIPENDIO
+  description    TEXT,                      -- mención / petición del estipendio
   created_by     INT REFERENCES users(id),
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -131,8 +136,12 @@ CREATE TABLE IF NOT EXISTS parish (
 );
 
 -- Datos iniciales de ejemplo (editables desde la pantalla de Maestros)
+-- v1.1: si el tipo de ejemplo sigue intacto, se renombra; si el usuario ya lo personalizó, no se toca
+UPDATE income_types SET code = 'EST-MISA', name = 'Estipendio de misa'
+ WHERE code = 'INT-MISA' AND name = 'Intención de misa'
+   AND NOT EXISTS (SELECT 1 FROM income_types WHERE code = 'EST-MISA' OR name = 'Estipendio de misa');
 INSERT INTO income_types (code, name, category_id)
-  SELECT 'INT-MISA', 'Intención de misa', id FROM income_categories WHERE code='INTENCION' ON CONFLICT DO NOTHING;
+  SELECT 'EST-MISA', 'Estipendio de misa', id FROM income_categories WHERE code='ESTIPENDIO' ON CONFLICT DO NOTHING;
 INSERT INTO income_types (code, name, category_id)
   SELECT 'DON-COLECTA', 'Colecta dominical', id FROM income_categories WHERE code='DONACION' ON CONFLICT DO NOTHING;
 INSERT INTO expense_types (code, name, category_id)

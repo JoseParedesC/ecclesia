@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Alert, Button, Card, CardBody, CardHeader, Input, Select, Textarea } from "../../components/ui";
+import { Alert, Button, Card, CardBody, CardHeader, Input, MoneyInput, Select, Textarea } from "../../components/ui";
 import { pad } from "../../format";
 import { ID_TYPES, type IdType, type Movement, type TypeRow } from "../../types";
 
@@ -35,6 +35,8 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
   const [typeId, setTypeId] = useState(editing ? String(editing.typeId) : "");
   const [date, setDate] = useState(editing?.date ?? defaultDate(range));
   const [amount, setAmount] = useState(editing ? String(editing.amount) : "");
+  // Último valor sugerido que se cargó solo; sirve para saber si la persona ya escribió su propio monto
+  const [suggested, setSuggested] = useState("");
   const [description, setDescription] = useState(editing?.description ?? "");
   const [intentionDate, setIntentionDate] = useState(editing?.intentionDate ?? "");
   const [responsible, setResponsible] = useState(editing?.responsible ?? "");
@@ -48,8 +50,20 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
   const [saving, setSaving] = useState(false);
 
   const selected = types.find((t) => String(t.id) === typeId);
-  const isIntention = isIncome && selected?.categoryCode === "INTENCION";
+  const isStipend = isIncome && selected?.categoryCode === "ESTIPENDIO";
   const options = types.filter((t) => t.active || String(t.id) === typeId);
+
+  /** Al elegir un tipo con valor sugerido (estipendios) y crear un ingreso nuevo, propone ese monto si la persona aún no escribió otro. */
+  function changeType(id: string) {
+    setTypeId(id);
+    if (editing) return;
+    const def = types.find((t) => String(t.id) === id)?.defaultAmount;
+    const next = def != null ? String(def) : "";
+    if (amount === "" || amount === suggested) {
+      setAmount(next);
+      setSuggested(next);
+    }
+  }
 
   function validate(): Errors {
     const e: Errors = {};
@@ -57,8 +71,8 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
     if (!date) e.date = "La fecha es obligatoria";
     else if (date < range.min || date > range.max) e.date = "La fecha debe estar dentro de un período abierto";
     if (!(Number(amount) > 0)) e.amount = "El monto debe ser mayor que cero";
-    if (isIntention && !intentionDate) e.intentionDate = "Indica la fecha en que se realizará";
-    if (isIntention && !description.trim()) e.description = "La mención o petición es obligatoria";
+    if (isStipend && !intentionDate) e.intentionDate = "Indica la fecha en que se realizará";
+    if (isStipend && !description.trim()) e.description = "La mención o petición es obligatoria";
     if (!responsible.trim()) e.responsible = "El responsable es obligatorio";
     if (!address.trim()) e.address = "La dirección es obligatoria";
     if (!idType) e.idType = "Selecciona el tipo de identificación";
@@ -79,7 +93,7 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
     try {
       await onSubmit({
         typeId: Number(typeId), date, amount: Number(amount), description: description.trim() || null,
-        ...(isIntention ? { intentionDate: intentionDate || null } : {}),
+        ...(isStipend ? { intentionDate: intentionDate || null } : {}),
         responsible: responsible.trim(), address: address.trim(), idType: idType as IdType, idNumber: idNumber.trim(),
         phone: phone.trim(), email: email.trim() || null,
       });
@@ -93,20 +107,23 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
   return (
     <form onSubmit={submit} noValidate className="space-y-5">
       <Card>
-        <CardHeader title="Datos del movimiento" description={isIntention ? "Las intenciones requieren la fecha en que se celebrarán y la petición." : undefined} />
+        <CardHeader title="Datos del movimiento" description={isStipend ? "Los estipendios requieren la fecha en que se celebrará la intención y la petición." : undefined} />
         <CardBody>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Select label="Tipo" required value={typeId} error={errors.typeId} onChange={(e) => setTypeId(e.target.value)}>
+            <Select label="Tipo" required value={typeId} error={errors.typeId} onChange={(e) => changeType(e.target.value)}>
               <option value="">Selecciona…</option>
               {options.map((t) => <option key={t.id} value={t.id}>{t.name} · {t.categoryName}</option>)}
             </Select>
             <Input label="Fecha" type="date" required min={range.min} max={range.max} value={date} error={errors.date} onChange={(e) => setDate(e.target.value)} />
-            <Input label="Monto" type="number" required min="0.01" step="0.01" inputMode="decimal" value={amount} error={errors.amount} onChange={(e) => setAmount(e.target.value)} />
-            {isIntention && (
+            <MoneyInput
+              label="Monto" required value={amount} error={errors.amount} onValueChange={setAmount}
+              hint={amount !== "" && amount === suggested ? "Valor sugerido para este tipo; puedes modificarlo." : undefined}
+            />
+            {isStipend && (
               <Input label="Fecha en que se realizará" type="date" required value={intentionDate} error={errors.intentionDate} onChange={(e) => setIntentionDate(e.target.value)} className="animate-slide-down" />
             )}
             <Textarea
-              label={isIntention ? "Mención o petición" : "Descripción"} rows={2} required={isIntention}
+              label={isStipend ? "Mención o petición" : "Descripción"} rows={2} required={isStipend}
               value={description} error={errors.description} onChange={(e) => setDescription(e.target.value)} className="sm:col-span-2"
             />
           </div>

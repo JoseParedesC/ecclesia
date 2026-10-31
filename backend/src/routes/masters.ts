@@ -23,8 +23,10 @@ const bodySchema = z.object({
 export function mastersRouter(kind: Kind) {
   const k = KINDS[kind];
   const label = kind === "income" ? "ingresos registrados" : "egresos registrados";
+  // Solo los tipos de ingreso tienen valor sugerido; en egresos la columna no existe
+  const defaultCol = kind === "income" ? "t.default_amount" : "NULL::numeric";
   const select = `SELECT t.id::text AS id, t.code, t.name, t.category_id::text AS "categoryId",
-      c.code AS "categoryCode", c.name AS "categoryName", t.account_code AS "accountCode", t.active,
+      c.code AS "categoryCode", c.name AS "categoryName", t.account_code AS "accountCode", ${defaultCol} AS "defaultAmount", t.active,
       t.created_at AS "createdAt", COALESCE(t.created_by::text, '') AS "createdBy",
       t.updated_at AS "updatedAt", COALESCE(t.updated_by::text, '') AS "updatedBy"
     FROM ${k.type} t JOIN ${k.cat} c ON c.id = t.category_id`;
@@ -85,6 +87,27 @@ export function mastersRouter(kind: Kind) {
       `UPDATE ${k.type} SET code=$2, name=$3, category_id=$4, account_code=$5, updated_by=$6, updated_at=now() WHERE id=$1`,
       [id, b.code ?? current.code, b.name ?? current.name, b.categoryId ?? current.categoryId, account, req.user!.id],
     );
+    // El valor sugerido solo existe en la categoría Estipendio: si el tipo sale de ella, se borra
+    if (kind === "income")
+      await pool.query(
+        `UPDATE income_types SET default_amount = NULL
+          WHERE id = $1 AND category_id <> (SELECT id FROM income_categories WHERE code = $2)`,
+        [id, k.stipendCode],
+      );
+    res.json(await getOne(id));
+  });
+
+  // Valor sugerido (solo ingresos de categoría Estipendio): se propone al crear un ingreso de ese tipo
+  r.patch("/:id/default-amount", write, async (req, res) => {
+    if (kind !== "income") throw new HttpError(404, "Recurso no encontrado.");
+    const id = Number(req.params.id);
+    const { defaultAmount } = z
+      .object({ defaultAmount: z.number().positive("El valor debe ser mayor que cero").multipleOf(0.01).max(999999999999.99).nullable() })
+      .parse(req.body);
+    const current = await getOne(id);
+    if (current.categoryCode !== k.stipendCode)
+      throw new HttpError(422, "Solo los tipos de la categoría Estipendio admiten un valor sugerido.");
+    await pool.query(`UPDATE income_types SET default_amount=$2, updated_by=$3, updated_at=now() WHERE id=$1`, [id, defaultAmount, req.user!.id]);
     res.json(await getOne(id));
   });
 

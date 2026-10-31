@@ -33,7 +33,7 @@ export async function buildConsolidado(periodId: number) {
   const ingresos = sum(incomes);
   const egresos = sum(expenses);
   const totals = {
-    intencion: sum(incomes, "INTENCION"),
+    estipendio: sum(incomes, "ESTIPENDIO"),
     donacion: sum(incomes, "DONACION"),
     ingresos,
     servicio: sum(expenses, "SERVICIO"),
@@ -52,7 +52,7 @@ const line = (...cells: unknown[]) => cells.map(esc).join(";");
 
 /** CSV con ';' y BOM (se abre bien en Excel en configuración regional en español). */
 export function consolidadoToCsv(d: Awaited<ReturnType<typeof buildConsolidado>>) {
-  const head = ["Fecha", "Tipo", "Categoría", "Cuenta contable", "Fecha intención", "Responsable", "Identificación", "Descripción", "Monto"];
+  const head = ["Fecha", "Tipo", "Categoría", "Cuenta contable", "Fecha de realización", "Responsable", "Identificación", "Descripción", "Monto"];
   const body = (list: Row[]) =>
     list.map((r) => line(r.date, r.type, r.categoryName, r.account, r.intentionDate, r.responsible, r.idType ? `${r.idType} ${r.idNumber ?? ""}`.trim() : "", r.description, r.amount));
   const t = d.totals;
@@ -61,7 +61,7 @@ export function consolidadoToCsv(d: Awaited<ReturnType<typeof buildConsolidado>>
     line(`Consolidado ${d.period.year}-${String(d.period.month).padStart(2, "0")}`, `Estado: ${d.period.status}`),
     "",
     line("INGRESOS"), line(...head), ...body(d.incomes),
-    tot("Total intenciones", t.intencion), tot("Total donaciones", t.donacion), tot("TOTAL INGRESOS", t.ingresos),
+    tot("Total estipendios", t.estipendio), tot("Total donaciones", t.donacion), tot("TOTAL INGRESOS", t.ingresos),
     "",
     line("EGRESOS"), line(...head), ...body(d.expenses),
     tot("Total servicios", t.servicio), tot("Total gastos", t.gasto), tot("TOTAL EGRESOS", t.egresos),

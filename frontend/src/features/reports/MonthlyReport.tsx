@@ -11,7 +11,7 @@ import { ReportTable } from "./ReportTable";
 
 const section = (rows: Consolidado["incomes"], a: string, b: string): ReportTotals => {
   const mk = (code: string, name: string) => { const r = rows.filter((x) => x.category === code); return { code, name, count: r.length, total: Math.round(r.reduce((s, x) => s + x.amount, 0) * 100) / 100 }; };
-  return { count: rows.length, total: Math.round(rows.reduce((s, x) => s + x.amount, 0) * 100) / 100, byCategory: [mk(a, a === "INTENCION" ? "Intenciones" : "Servicios"), mk(b, b === "DONACION" ? "Donaciones" : "Gastos")] };
+  return { count: rows.length, total: Math.round(rows.reduce((s, x) => s + x.amount, 0) * 100) / 100, byCategory: [mk(a, a === "ESTIPENDIO" ? "Estipendios" : "Servicios"), mk(b, b === "DONACION" ? "Donaciones" : "Gastos")] };
 };
 
 function Totals({ t, label }: { t: ReportTotals; label: string }) {
@@ -60,7 +60,7 @@ export function MonthlyReport() {
         <ReportSheet title={title} subtitle={p.status === "OPEN" ? "Período abierto: las cifras pueden cambiar" : "Período cerrado"}>
           <h3 className="mb-2 text-lg">Ingresos</h3>
           <ReportTable rows={data.incomes} columns={["date", "type", "category", "account", "intentionDate", "description"]} />
-          {data.incomes.length > 0 && <Totals t={section(data.incomes, "INTENCION", "DONACION")} label="Total ingresos" />}
+          {data.incomes.length > 0 && <Totals t={section(data.incomes, "ESTIPENDIO", "DONACION")} label="Total ingresos" />}
           <h3 className="mb-2 mt-8 text-lg">Egresos</h3>
           <ReportTable rows={data.expenses} columns={["date", "type", "category", "account", "description"]} />
           {data.expenses.length > 0 && <Totals t={section(data.expenses, "SERVICIO", "GASTO")} label="Total egresos" />}

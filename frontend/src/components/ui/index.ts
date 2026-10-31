@@ -4,6 +4,7 @@ export * from "./Button";
 export * from "./Card";
 export * from "./EmptyState";
 export * from "./Field";
+export * from "./MoneyInput";
 export * from "./Spinner";
 export * from "./Stat";
 export * from "./Table";

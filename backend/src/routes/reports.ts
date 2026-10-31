@@ -50,19 +50,19 @@ reportsRouter.get("/movements", async (req, res) => {
   res.json({ rows, totals: summarize(rows) });
 });
 
-// Intenciones por rango de fechas: por fecha de realización (por defecto) o de registro
+// Estipendios por rango de fechas: por fecha de realización de la intención (por defecto) o de registro
 const intentionsQ = z
   .object({ from: opt(isoDate), to: opt(isoDate), by: z.enum(["intention", "registered"]).default("intention") })
   .refine(rangeOk, rangeMsg);
 
-reportsRouter.get("/intentions", async (req, res) => {
+reportsRouter.get("/stipends", async (req, res) => {
   const q = intentionsQ.parse(req.query);
   const field = q.by === "intention" ? "m.intention_date" : "m.date"; // lista blanca, no viene del cliente
   const { rows } = await pool.query(
     `SELECT m.id, m.date, m.intention_date AS "intentionDate", t.name AS type, c.code AS category,
             c.name AS "categoryName", m.description, m.amount
        FROM incomes m JOIN income_types t ON t.id = m.income_type_id JOIN income_categories c ON c.id = t.category_id
-      WHERE c.code = 'INTENCION' AND ($1::date IS NULL OR ${field} >= $1) AND ($2::date IS NULL OR ${field} <= $2)
+      WHERE c.code = 'ESTIPENDIO' AND ($1::date IS NULL OR ${field} >= $1) AND ($2::date IS NULL OR ${field} <= $2)
       ORDER BY m.intention_date, m.id`,
     [q.from ?? null, q.to ?? null],
   );

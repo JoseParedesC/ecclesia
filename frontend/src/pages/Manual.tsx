@@ -69,7 +69,7 @@ export default function Manual() {
 
         <Section id="movimientos" title="4. Ingresos y egresos">
           <p><b>Listado.</b> Elige el período, busca por responsable, identificación, tipo o descripción, y filtra por tipo. Usa <b>Nuevo ingreso / Nuevo egreso</b> para crear; el lápiz edita y la papelera elimina (solo en períodos abiertos).</p>
-          <p><b>Formulario.</b> Es una pantalla aparte. Datos del movimiento: tipo, fecha (dentro de un período abierto), monto y descripción. Si el tipo es una <b>intención</b>, también son obligatorias la fecha en que se realizará y la mención o petición.</p>
+          <p><b>Formulario.</b> Es una pantalla aparte. Datos del movimiento: tipo, fecha (dentro de un período abierto), monto y descripción. Si el tipo es un <b>estipendio</b>, también son obligatorias la fecha en que se realizará la intención y la mención o petición. Si el tipo tiene un <b>valor sugerido</b>, el monto aparece ya escrito y puedes cambiarlo. Los montos se escriben con el símbolo <b>$</b> y separadores de miles; usa la coma (o el punto del teclado numérico) para los centavos.</p>
           <p><b>Responsable</b> (quien entrega el dinero, o a quien se le paga):</p>
           <ul>
             <li>Obligatorios: responsable, dirección, tipo de identificación (<b>NIT, CC o TI</b>), número de identificación y teléfono de contacto.</li>
@@ -79,9 +79,10 @@ export default function Manual() {
         </Section>
 
         <Section id="maestros" title="5. Maestros">
-          <p>Administran los tipos de ingreso (Intención o Donación) y de egreso (Servicio o Gasto), con código, nombre y cuenta contable.</p>
+          <p>Administran los tipos de ingreso (Estipendio o Donación) y de egreso (Servicio o Gasto), con código, nombre y cuenta contable.</p>
           <ul>
             <li>La <b>cuenta contable</b> solo la definen el contador y el administrador.</li>
+            <li>El <b>valor sugerido</b> de cada tipo de estipendio se configura en el panel que está debajo de la tabla de ingresos (lo editan sacerdote, contador y administrador). Déjalo vacío para no sugerir ningún monto.</li>
             <li>Un tipo con movimientos no se elimina ni cambia de código o categoría: <b>desactívalo</b>.</li>
           </ul>
         </Section>
@@ -89,7 +90,7 @@ export default function Manual() {
         <Section id="reportes" title="6. Reportes">
           <ul>
             <li><b>Ingresos / Egresos:</b> rango de fechas, categoría y tipo, con responsable e identificación.</li>
-            <li><b>Intenciones:</b> por fecha de realización o de registro.</li>
+            <li><b>Estipendios:</b> por fecha de realización de la intención o de registro.</li>
             <li><b>Consolidado mensual:</b> ingresos, egresos y saldo del período.</li>
           </ul>
           <p>Con <b>Imprimir</b> se abre el diálogo del navegador; ahí puedes elegir «Guardar como PDF».</p>

@@ -33,7 +33,7 @@ export function movementsRouter(kind: Kind) {
     FROM ${k.mov} m JOIN ${k.type} t ON t.id = m.${k.fk} JOIN ${k.cat} c ON c.id = t.category_id
     JOIN periods p ON p.id = m.period_id`;
 
-  /** Valida tipo/categoría y la regla de intención. Devuelve valores normalizados. */
+  /** Valida tipo/categoría y la regla de estipendio. Devuelve valores normalizados. */
   async function normalize(c: PoolClient, b: z.infer<typeof bodySchema>, mustBeActive: boolean) {
     const { rows } = await c.query(
       `SELECT t.active, cat.code FROM ${k.type} t JOIN ${k.cat} cat ON cat.id = t.category_id WHERE t.id = $1`,
@@ -41,11 +41,11 @@ export function movementsRouter(kind: Kind) {
     );
     if (!rows[0]) throw new HttpError(422, "El tipo seleccionado no existe.");
     if (mustBeActive && !rows[0].active) throw new HttpError(422, "El tipo seleccionado está inactivo.");
-    const isIntention = k.intentionCode !== null && rows[0].code === k.intentionCode;
+    const isStipend = k.stipendCode !== null && rows[0].code === k.stipendCode;
     const description = b.description?.trim() || null;
-    if (isIntention && (!b.intentionDate || !description))
-      throw new HttpError(422, "Una intención requiere la fecha en que se realizará y la descripción (mención/petición).");
-    return { description, intentionDate: isIntention ? b.intentionDate! : null };
+    if (isStipend && (!b.intentionDate || !description))
+      throw new HttpError(422, "Un estipendio requiere la fecha en que se realizará la intención y la descripción (mención/petición).");
+    return { description, intentionDate: isStipend ? b.intentionDate! : null };
   }
 
   async function existing(c: PoolClient, id: number) {

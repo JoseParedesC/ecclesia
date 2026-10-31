@@ -9,6 +9,8 @@ export interface Parish {
 export interface Category { id: number; code: string; name: string }
 export interface TypeRow extends MasterEntity {
   categoryId: string; categoryCode: string; categoryName: string; accountCode: string | null;
+  /** Valor sugerido (solo tipos de la categoría Estipendio); null si no tiene. */
+  defaultAmount: number | null;
 }
 export type IdType = "NIT" | "CC" | "TI";
 export const ID_TYPES: { value: IdType; label: string }[] = [
@@ -23,7 +25,7 @@ export interface Movement {
   phone: string | null; email: string | null;
 }
 export interface Totals {
-  intencion: number; donacion: number; ingresos: number; servicio: number; gasto: number; egresos: number; saldo: number;
+  estipendio: number; donacion: number; ingresos: number; servicio: number; gasto: number; egresos: number; saldo: number;
 }
 
 export interface UserRow { id: number; email: string; name: string | null; role: Role; active: boolean }

@@ -22,7 +22,7 @@ export function MovementsTable({ rows, isIncome, onEdit, onDelete }: Props) {
               <Td className="whitespace-nowrap tabular-nums">{m.date}</Td>
               <Td>
                 <p className="font-medium">{m.typeName}</p>
-                <Badge tone={m.categoryCode === "INTENCION" ? "primary" : "neutral"}>{m.categoryName}</Badge>
+                <Badge tone={m.categoryCode === "ESTIPENDIO" ? "primary" : "neutral"}>{m.categoryName}</Badge>
               </Td>
               {isIncome && <Td className="whitespace-nowrap tabular-nums">{m.intentionDate ?? "—"}</Td>}
               <Td>

@@ -4,7 +4,7 @@ import type { Period, Totals } from "../../types";
 
 export function PeriodSummary({ period, totals }: { period: Period; totals: Totals }) {
   const rows: [string, number][] = [
-    ["Intenciones", totals.intencion], ["Donaciones", totals.donacion], ["Servicios", totals.servicio], ["Gastos", totals.gasto],
+    ["Estipendios", totals.estipendio], ["Donaciones", totals.donacion], ["Servicios", totals.servicio], ["Gastos", totals.gasto],
   ];
   return (
     <div className="animate-slide-up space-y-4">
