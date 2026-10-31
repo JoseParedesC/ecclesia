@@ -27,10 +27,12 @@
 - [x] Pantalla de Ingresos y Egresos con campos condicionales de intención
 - [x] Pantalla de Maestros con `@joseparedesc/master-crud` (campo cuenta contable solo para contador)
 - [x] Tailwind configurado con los tokens que exige el paquete de maestros
+- [x] Archivo central de estilos (`theme.tokens.json`) y tema claro/oscuro/sistema
+- [x] Jerarquía ui → layout → features → pages, con transiciones suaves, toasts y diálogos de confirmación
 
 ## ⏳ Pendiente
 
-- [ ] Verificar visualmente la UI en el navegador (no pudo ejecutarse aquí) y ajustar estilos del componente de maestros
+- [ ] Revisar visualmente la UI en el navegador (claro y oscuro, móvil y escritorio); aquí solo se verificó que compila y que el CSS se genera
 - [ ] Probar el login real con Firebase (proyecto, dominio autorizado, credenciales Admin)
 - [ ] Pantalla de administración de usuarios y roles (hoy solo existe la API)
 - [ ] Consolidado en Excel (.xlsx) y/o PDF; hoy es CSV

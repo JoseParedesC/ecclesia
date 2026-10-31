@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { API_URL, api, getToken } from "../api";
 import { useAuth } from "../auth";
 import { buildMasterConfig } from "../masterConfigs";
+import { PageHeader } from "../components/layout/PageHeader";
+import { Spinner, Tabs } from "../components/ui";
 import type { Category, TypeRow } from "../types";
 
 function MasterTab({ kind }: { kind: "income" | "expense" }) {
@@ -25,7 +27,7 @@ function MasterTab({ kind }: { kind: "income" | "expense" }) {
     [config],
   );
 
-  if (!config || !adapter) return <p className="muted">Cargando…</p>;
+  if (!config || !adapter) return <div className="flex justify-center py-16 text-primary"><Spinner className="h-6 w-6" /></div>;
   return <MasterCrud adapter={adapter} config={config} currentUser={{ uid: String(me!.id) }} />;
 }
 
@@ -33,12 +35,11 @@ export default function Masters() {
   const [kind, setKind] = useState<"income" | "expense">("income");
   return (
     <>
-      <h1>Maestros</h1>
-      <div className="tabs" role="tablist">
-        <button role="tab" aria-selected={kind === "income"} onClick={() => setKind("income")}>Ingresos</button>
-        <button role="tab" aria-selected={kind === "expense"} onClick={() => setKind("expense")}>Egresos</button>
+      <PageHeader title="Maestros" description="Tipos de ingreso y de egreso con su categoría. La cuenta contable solo la define el contador." />
+      <div className="mb-5">
+        <Tabs value={kind} onChange={setKind} items={[{ value: "income", label: "Ingresos" }, { value: "expense", label: "Egresos" }]} />
       </div>
-      <MasterTab kind={kind} key={kind} />
+      <div className="animate-fade-in" key={kind}><MasterTab kind={kind} /></div>
     </>
   );
 }

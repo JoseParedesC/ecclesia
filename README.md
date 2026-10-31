@@ -32,3 +32,14 @@ El primer inicio de sesión debe hacerse con el correo de `BOOTSTRAP_ADMIN_EMAIL
 - Los maestros solo los edita sacerdote, contador y administrador; el secretario los consulta.
 - Los usuarios deben estar pre-registrados por un administrador (no hay auto-registro).
 - Moneda por defecto COP (`VITE_CURRENCY`).
+
+## Diseño y tema
+
+- **Un solo archivo de estilos:** `frontend/theme.tokens.json` define colores (claro y oscuro), tipografía, radios, sombras y tiempos de animación. `tailwind.config.js` lo convierte en variables CSS y en utilidades; ningún componente tiene colores propios. Para cambiar la marca, edita solo ese archivo.
+- **Tema claro / oscuro / sistema:** selector en la barra superior (y en el login). La preferencia se guarda en `localStorage`; "sistema" sigue en vivo el modo del sistema operativo y no hay parpadeo al cargar.
+- **Jerarquía de componentes** (`frontend/src`):
+  - `components/ui` → átomos y moléculas (Button, Field, Card, Badge, Alert, Table, Stat, Tabs, toast, confirm…)
+  - `components/layout` → AppShell, PageHeader, ThemeToggle, Brand
+  - `features/periods`, `features/movements` → bloques de negocio
+  - `pages` → solo orquestan datos y componen
+- Las animaciones usan los tiempos de `motion` en los tokens y se desactivan con "reducir movimiento" del sistema.

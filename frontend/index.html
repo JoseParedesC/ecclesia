@@ -3,6 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Aplica el tema antes del primer pintado para evitar el parpadeo
+      (function () { try {
+        var p = localStorage.getItem("theme");
+        var dark = p === "dark" || (p !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      } catch (e) {} })();
+    </script>
     <title>Finanzas parroquiales</title>
   </head>
   <body>

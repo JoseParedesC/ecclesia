@@ -1,0 +1,55 @@
+{
+  "_doc": "ÚNICA fuente de colores, tipografía, radios, sombras y movimiento. tailwind.config.js la convierte en variables CSS (--c-*) y en utilidades de Tailwind. Para cambiar la marca basta con editar este archivo.",
+  "colors": {
+    "light": {
+      "bg": "#F4F5F9",
+      "surface": "#FFFFFF",
+      "mist": "#ECEEF4",
+      "line": "#DCE0EA",
+      "ink": "#1B2130",
+      "muted": "#5E687B",
+      "primary": "#5B3F8C",
+      "primary-ink": "#FFFFFF",
+      "primary-soft": "#EDE7F7",
+      "success": "#1C7A4B",
+      "success-soft": "#DDF1E6",
+      "danger": "#B3372F",
+      "danger-soft": "#FBE5E3",
+      "warning": "#9A6212",
+      "warning-soft": "#FBEFD6"
+    },
+    "dark": {
+      "bg": "#10131B",
+      "surface": "#1A1E2A",
+      "mist": "#242938",
+      "line": "#31374A",
+      "ink": "#E9ECF4",
+      "muted": "#9AA3B8",
+      "primary": "#B7A2EC",
+      "primary-ink": "#17112A",
+      "primary-soft": "#2C2546",
+      "success": "#5FCF97",
+      "success-soft": "#1B3A2D",
+      "danger": "#FF8F86",
+      "danger-soft": "#40211F",
+      "warning": "#F0B85A",
+      "warning-soft": "#3E3118"
+    }
+  },
+  "fonts": {
+    "sans": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    "serif": "Georgia, 'Iowan Old Style', 'Times New Roman', serif"
+  },
+  "radius": { "sm": "0.375rem", "md": "0.5rem", "lg": "0.75rem", "xl": "1rem", "xl2": "1.25rem" },
+  "shadows": {
+    "light": {
+      "soft": "0 1px 2px rgb(27 33 48 / 0.06), 0 1px 1px rgb(27 33 48 / 0.04)",
+      "card": "0 12px 32px rgb(27 33 48 / 0.16)"
+    },
+    "dark": {
+      "soft": "0 1px 2px rgb(0 0 0 / 0.4)",
+      "card": "0 16px 40px rgb(0 0 0 / 0.55)"
+    }
+  },
+  "motion": { "fast": "120ms", "base": "200ms", "slow": "320ms", "ease": "cubic-bezier(0.2, 0.8, 0.2, 1)" }
+}
