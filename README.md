@@ -48,6 +48,12 @@ Igual que los maestros, cada módulo tiene dos pantallas:
 
 Los registros creados antes de esta versión no tienen responsable; al editarlos se pedirá.
 
+## Menú y configuración
+
+La barra lateral usa un menú con submenús ramificados que se abren **hacia la derecha** (`components/layout/SidebarNav.tsx`; hover, clic o teclado, `Esc` cierra). **Configuración** agrupa **Maestros**, **Usuarios** (solo roles que pueden crear usuarios) y **Parroquia**.
+
+**Parroquia** (`/parish` consulta, `/parish/edit` formulario; tabla `parish` de un solo registro, `GET/PUT /api/parish`): nombre, departamento, ciudad y dirección obligatorios; logo, correo y teléfono opcionales. El logo se reduce a 256 px en el navegador y se guarda como data URL. Se muestra en el menú y en el encabezado de los reportes. Supuesto a validar: la editan sacerdote y administrador; los demás roles la consultan.
+
 ## Manual de usuario
 
 La opción **How to use** (pie del menú) abre `/manual`. El mismo contenido está en `docs/MANUAL_USUARIO.md`.

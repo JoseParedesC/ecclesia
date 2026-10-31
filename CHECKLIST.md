@@ -37,11 +37,18 @@
 - [x] Tailwind configurado con los tokens que exige el paquete de maestros
 - [x] Archivo central de estilos (`theme.tokens.json`) y tema claro/oscuro/sistema; paleta clara dorada/crema (primario `#D4AF37`, variantes `primary_` en `#B88A24`; el tema oscuro hereda sus equivalentes)
 - [x] Estilo profesional unificado: tarjetas y tablas con bordes redondeados y encabezados en versalitas, botones primarios con degradado dorado, insignias con punto, alertas con acento lateral, menú lateral con indicador de sección activa, fondo con halos suaves, barras de desplazamiento finas; texto de acento sobre fondo claro usa `primary_` para mejor contraste
+- [x] Menú lateral ramificado con submenú que se despliega hacia la derecha (`SidebarNav.tsx`); sección Configuración con Maestros, Usuarios y Parroquia
+- [x] Parroquia: tabla `parish` (un registro), `GET/PUT /api/parish`, pantallas `/parish` (consulta) y `/parish/edit` (formulario) con nombre, departamento, ciudad, dirección (obligatorios), logo, correo y teléfono (opcionales); nombre y logo en el menú y en el encabezado de los reportes
 - [x] Opción «How to use» al pie del menú lateral que lleva al manual de usuario (`/manual`, `pages/Manual.tsx`); el mismo contenido está en `docs/MANUAL_USUARIO.md`
 - [x] Regla del proyecto: todo CRUD tiene listado y formulario en pantallas aparte (maestros, ingresos, egresos, usuarios)
 - [x] Jerarquía ui → layout → features → pages, con transiciones suaves, toasts y diálogos de confirmación
 
 ## ⏳ Pendiente
+
+- [ ] Probar en el navegador el menú desplegable a la derecha (hover, clic en móvil, teclado y `Esc`) y que el panel no quede tapado por el contenido
+- [ ] Probar la subida del logo y su guardado (el JSON del backend se amplió a 1 MB); confirmar que PUT /parish rechaza imágenes inválidas
+- [ ] Confirmar que solo sacerdote y administrador editen la parroquia (supuesto) y si el departamento debe ser lista cerrada
+- [ ] Navegación con flechas dentro del submenú (hoy se usa Tab) y submenús para Ingresos/Egresos si se agregan más opciones
 
 - [ ] Mantener sincronizados `pages/Manual.tsx` y `docs/MANUAL_USUARIO.md` cuando cambien las reglas (hoy son dos copias); valorar cargar el .md en la app con un renderizador
 

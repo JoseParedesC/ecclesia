@@ -116,6 +116,20 @@ ALTER TABLE expenses ADD COLUMN IF NOT EXISTS email            TEXT;   -- opcion
 CREATE INDEX IF NOT EXISTS incomes_responsible  ON incomes  (id_number);
 CREATE INDEX IF NOT EXISTS expenses_responsible ON expenses (id_number);
 
+-- Datos de la parroquia (un solo registro: id = 1)
+CREATE TABLE IF NOT EXISTS parish (
+  id            SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  name          TEXT NOT NULL,
+  department    TEXT NOT NULL,
+  city          TEXT NOT NULL,
+  address       TEXT NOT NULL,
+  logo          TEXT,               -- imagen como data URL (png/jpeg/webp), opcional
+  contact_email TEXT,               -- opcional
+  contact_phone TEXT,               -- opcional
+  updated_by    INT REFERENCES users(id),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Datos iniciales de ejemplo (editables desde la pantalla de Maestros)
 INSERT INTO income_types (code, name, category_id)
   SELECT 'INT-MISA', 'Intención de misa', id FROM income_categories WHERE code='INTENCION' ON CONFLICT DO NOTHING;

@@ -2,6 +2,10 @@ import type { MasterEntity } from "@joseparedesc/master-crud";
 export type Role = "sacerdote" | "contador" | "administrador" | "secretario";
 export interface Me { id: number; email: string; name: string | null; role: Role; creatableRoles: Role[] }
 export interface Period { id: number; year: number; month: number; status: "OPEN" | "CLOSED"; closedAt: string | null }
+export interface Parish {
+  name: string; department: string; city: string; address: string;
+  logo: string | null; email: string | null; phone: string | null;
+}
 export interface Category { id: number; code: string; name: string }
 export interface TypeRow extends MasterEntity {
   categoryId: string; categoryCode: string; categoryName: string; accountCode: string | null;

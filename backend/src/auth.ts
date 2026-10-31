@@ -53,4 +53,6 @@ export const CREATABLE_ROLES: Record<Role, Role[]> = {
 export const REOPEN_ROLES: Role[] = ["sacerdote", "contador", "administrador"];
 /** roles que pueden definir la cuenta contable de los maestros */
 export const ACCOUNT_ROLES: Role[] = ["contador", "administrador"];
+/** roles que pueden editar los datos de la parroquia */
+export const PARISH_WRITE_ROLES: Role[] = ["sacerdote", "administrador"];
 export const MASTER_WRITE_ROLES: Role[] = ["sacerdote", "contador", "administrador"];

@@ -8,6 +8,10 @@ _Finanzas parroquiales: ingresos, egresos, cierre mensual y reportes._
 2. Usa la cuenta de Google con la que te registraron. Si ves «Tu cuenta no está autorizada», pide a un administrador que te agregue en **Usuarios**.
 3. Para cerrar sesión usa el botón **Cerrar sesión** al pie del menú lateral.
 
+### El menú lateral
+
+Las opciones principales son Períodos, Ingresos, Egresos y Reportes. **Configuración** es un menú ramificado: al pasar el cursor, pulsar (en el celular) o con el teclado, se despliega **hacia la derecha** con **Maestros**, **Usuarios** (solo para los roles que pueden crear usuarios) y **Parroquia**. Con `Esc` se cierra.
+
 ## 2. Roles y permisos
 
 | Rol | Qué puede hacer |
@@ -78,11 +82,27 @@ Solo lo ven los roles que pueden crear usuarios. Cada rol gestiona únicamente l
 - **Editar:** nombre y rol (el correo no cambia). Nadie puede cambiar su propio rol ni desactivarse.
 - **Desactivar:** la persona ya no puede iniciar sesión; sus registros se conservan.
 
-## 8. Tema
+## 8. Parroquia
+
+En **Configuración → Parroquia** se consultan los datos de la parroquia; **solo el sacerdote y el administrador** los editan (botón **Editar datos**, en pantalla aparte).
+
+| Campo | Obligatorio |
+|---|---|
+| Nombre | Sí |
+| Departamento | Sí |
+| Ciudad | Sí |
+| Dirección | Sí |
+| Logo (PNG, JPG o WEBP; se ajusta a 256 px) | No |
+| Correo de contacto | No |
+| Teléfono de contacto | No |
+
+El nombre y el logo se muestran en el menú lateral y en el encabezado de los reportes impresos.
+
+## 9. Tema
 
 En la barra superior puedes elegir tema **claro**, **oscuro** o **seguir el sistema**. Al imprimir siempre se usan colores claros.
 
-## 9. Mensajes frecuentes
+## 10. Mensajes frecuentes
 
 | Mensaje | Qué hacer |
 |---|---|

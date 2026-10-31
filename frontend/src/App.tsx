@@ -7,10 +7,13 @@ import Manual from "./pages/Manual";
 import Masters from "./pages/Masters";
 import MovementEdit from "./pages/MovementEdit";
 import Movements from "./pages/Movements";
+import Parish from "./pages/Parish";
+import ParishEdit from "./pages/ParishEdit";
 import Periods from "./pages/Periods";
 import Reports from "./pages/Reports";
 import UserEdit from "./pages/UserEdit";
 import Users from "./pages/Users";
+import { ParishProvider } from "./parish";
 import { ThemeProvider } from "./theme/ThemeProvider";
 
 function Gate() {
@@ -18,6 +21,7 @@ function Gate() {
   if (loading) return <div className="grid min-h-screen place-items-center text-primary_"><Spinner className="h-7 w-7" /></div>;
   if (!me) return <Login />;
   return (
+    <ParishProvider>
     <Routes>
       <Route element={<AppShell />}>
         <Route path="/periods" element={<Periods />} />
@@ -29,6 +33,8 @@ function Gate() {
         <Route path="/expenses/:id/edit" element={<MovementEdit kind="expenses" />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/manual" element={<Manual />} />
+        <Route path="/parish" element={<Parish />} />
+        <Route path="/parish/edit" element={<ParishEdit />} />
         <Route path="/masters" element={<Masters />} />
         {me.creatableRoles.length > 0 ? (
           <>
@@ -42,6 +48,7 @@ function Gate() {
         <Route path="*" element={<Navigate to="/periods" replace />} />
       </Route>
     </Routes>
+    </ParishProvider>
   );
 }
 

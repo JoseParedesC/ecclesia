@@ -1,46 +1,34 @@
-import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, CircleHelp, LogOut, Menu, Printer, Settings2, Users, X, type LucideIcon } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, CircleHelp, Landmark, ListTree, LogOut, Menu, Printer, Settings, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { cn } from "../../lib/cn";
 import { Badge, Button } from "../ui";
 import { Brand } from "./Brand";
+import { NavItem, SidebarNav, type NavNode } from "./SidebarNav";
 import { ThemeToggle } from "./ThemeToggle";
-
-const nav: { to: string; label: string; Icon: LucideIcon; needsUsers?: boolean }[] = [
-  { to: "/periods", label: "Períodos", Icon: CalendarDays },
-  { to: "/incomes", label: "Ingresos", Icon: ArrowDownToLine },
-  { to: "/expenses", label: "Egresos", Icon: ArrowUpFromLine },
-  { to: "/reports", label: "Reportes", Icon: Printer },
-  { to: "/masters", label: "Maestros", Icon: Settings2 },
-  { to: "/users", label: "Usuarios", Icon: Users, needsUsers: true },
-];
-
-function NavItem({ to, label, Icon }: Omit<(typeof nav)[number], "needsUsers">) {
-  return (
-    <NavLink
-      to={to}
-      className={({ isActive }) =>
-        cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-fast ease-standard",
-          "relative",
-          isActive
-            ? "bg-primary-soft text-primary_ shadow-soft before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-full before:bg-primary_ before:content-['']"
-            : "text-muted hover:bg-mist hover:text-ink",
-        )
-      }
-    >
-      <Icon className="h-5 w-5" aria-hidden="true" />
-      {label}
-    </NavLink>
-  );
-}
 
 export function AppShell() {
   const { me, logout } = useAuth();
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
+
+  // Configuración se despliega hacia la derecha; Usuarios solo aparece a los roles que pueden crear usuarios
+  const nav: NavNode[] = [
+    { to: "/periods", label: "Períodos", Icon: CalendarDays },
+    { to: "/incomes", label: "Ingresos", Icon: ArrowDownToLine },
+    { to: "/expenses", label: "Egresos", Icon: ArrowUpFromLine },
+    { to: "/reports", label: "Reportes", Icon: Printer },
+    {
+      label: "Configuración", Icon: Settings,
+      children: [
+        { to: "/masters", label: "Maestros", Icon: ListTree },
+        ...((me?.creatableRoles.length ?? 0) > 0 ? [{ to: "/users", label: "Usuarios", Icon: Users }] : []),
+        { to: "/parish", label: "Parroquia", Icon: Landmark },
+      ],
+    },
+  ];
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[16.5rem_minmax(0,1fr)] print:!block">
@@ -59,7 +47,7 @@ export function AppShell() {
           <Brand />
           <button aria-label="Cerrar menú" onClick={() => setOpen(false)} className="rounded p-1 text-muted hover:bg-mist lg:hidden"><X className="h-5 w-5" /></button>
         </div>
-        <nav aria-label="Principal" className="flex flex-col gap-1">{nav.filter((n) => !n.needsUsers || (me?.creatableRoles.length ?? 0) > 0).map(({ needsUsers: _u, ...n }) => <NavItem key={n.to} {...n} />)}</nav>
+        <SidebarNav items={nav} />
         <div className="mt-auto flex flex-col gap-3">
         <NavItem to="/manual" label="How to use" Icon={CircleHelp} />
         <div className="flex flex-col gap-3 rounded-xl border border-line bg-mist/70 p-3">

@@ -13,7 +13,7 @@ const Section = ({ id, title, children }: { id: string; title: string; children:
 
 const toc = [
   ["login", "Iniciar sesión"], ["roles", "Roles"], ["periodos", "Períodos"], ["movimientos", "Ingresos y egresos"],
-  ["maestros", "Maestros"], ["reportes", "Reportes"], ["usuarios", "Usuarios"], ["tema", "Tema"], ["faq", "Mensajes frecuentes"],
+  ["maestros", "Maestros"], ["reportes", "Reportes"], ["usuarios", "Usuarios"], ["parroquia", "Parroquia"], ["tema", "Tema"], ["faq", "Mensajes frecuentes"],
 ] as const;
 
 const faq: [string, string][] = [
@@ -42,6 +42,10 @@ export default function Manual() {
             <li>Si ves «Tu cuenta no está autorizada», pide a un administrador que te agregue en <b>Usuarios</b>.</li>
             <li>Para salir usa <b>Cerrar sesión</b>, al pie del menú lateral.</li>
           </ol>
+        </Section>
+
+        <Section id="menu" title="El menú lateral">
+          <p>Las opciones principales son Períodos, Ingresos, Egresos y Reportes. <b>Configuración</b> es un menú ramificado: al pasar el cursor, pulsar (en el celular) o usar el teclado, se despliega <b>hacia la derecha</b> con <b>Maestros</b>, <b>Usuarios</b> (solo para los roles que pueden crear usuarios) y <b>Parroquia</b>. Con <code>Esc</code> se cierra.</p>
         </Section>
 
         <Section id="roles" title="2. Roles y permisos">
@@ -100,11 +104,20 @@ export default function Manual() {
           </ul>
         </Section>
 
-        <Section id="tema" title="8. Tema">
+        <Section id="parroquia" title="8. Parroquia">
+          <p>En <b>Configuración → Parroquia</b> se consultan los datos de la parroquia; <b>solo el sacerdote y el administrador</b> los editan (botón «Editar datos», en pantalla aparte).</p>
+          <ul>
+            <li>Obligatorios: nombre, departamento, ciudad y dirección.</li>
+            <li>Opcionales: logo (PNG, JPG o WEBP; se ajusta a 256 px), correo y teléfono de contacto.</li>
+            <li>El nombre y el logo se muestran en el menú lateral y en el encabezado de los reportes impresos.</li>
+          </ul>
+        </Section>
+
+        <Section id="tema" title="9. Tema">
           <p>En la barra superior elige tema claro, oscuro o seguir el sistema. Al imprimir siempre se usan colores claros.</p>
         </Section>
 
-        <Section id="faq" title="9. Mensajes frecuentes">
+        <Section id="faq" title="10. Mensajes frecuentes">
           <TableWrap>
             <Table>
               <thead><tr><Th>Mensaje</Th><Th>Qué hacer</Th></tr></thead>

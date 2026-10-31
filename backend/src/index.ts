@@ -7,6 +7,7 @@ import { errorHandler } from "./errors.js";
 import { runMigrations } from "./migrate.js";
 import { mastersRouter } from "./routes/masters.js";
 import { movementsRouter } from "./routes/movements.js";
+import { parishRouter } from "./routes/parish.js";
 import { periodsRouter } from "./routes/periods.js";
 import { reportsRouter } from "./routes/reports.js";
 import { usersRouter } from "./routes/users.js";
@@ -30,7 +31,7 @@ if (bootstrapEmail) {
 
 const app = express();
 app.use(cors({ origin: config.corsOrigin }));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" })); // el logo de la parroquia viaja como data URL
 
 app.get("/api/health", (_req, res) => void res.json({ ok: true }));
 
@@ -46,6 +47,7 @@ api.use("/expense-types", mastersRouter("expense"));
 api.use("/incomes", movementsRouter("income"));
 api.use("/expenses", movementsRouter("expense"));
 api.use("/periods", periodsRouter);
+api.use("/parish", parishRouter);
 api.use("/reports", reportsRouter);
 api.use("/users", requireRole("administrador", "sacerdote", "secretario"), usersRouter);
 app.use("/api", api);
