@@ -4,6 +4,7 @@ import { z } from "zod";
 import { pool, tx } from "../db.js";
 import { HttpError } from "../errors.js";
 import { KINDS, type Kind } from "../kinds.js";
+import { todayISO } from "../services/dates.js";
 import { requireOpenPeriodForDate } from "../services/periods.js";
 import { refineIdNumber, responsibleShape } from "../services/responsible.js";
 
@@ -12,7 +13,7 @@ const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida (AAAA-M
 const bodySchema = z
   .object({
     typeId: z.number().int().positive(),
-    date: isoDate,
+    date: isoDate.optional(), // en ingresos se ignora: la fecha de registro es la fecha actual y no se edita
     amount: z.number().positive().multipleOf(0.01),
     description: z.string().trim().max(1000).nullish(),
     intentionDate: isoDate.nullish(),
@@ -29,9 +30,9 @@ export function movementsRouter(kind: Kind) {
       c.name AS "categoryName", t.account_code AS "accountCode", m.date, m.amount, m.description,
       ${intentionSel} AS "intentionDate", m.period_id AS "periodId", p.status AS "periodStatus",
       m.responsible_name AS "responsible", m.address, m.id_type AS "idType", m.id_number AS "idNumber",
-      m.contact_phone AS "phone", m.email
+      m.contact_phone AS "phone", m.email, m.created_at AS "createdAt", COALESCE(u.name, u.email) AS "registeredBy"
     FROM ${k.mov} m JOIN ${k.type} t ON t.id = m.${k.fk} JOIN ${k.cat} c ON c.id = t.category_id
-    JOIN periods p ON p.id = m.period_id`;
+    JOIN periods p ON p.id = m.period_id LEFT JOIN users u ON u.id = m.created_by`;
 
   /** Valida tipo/categoría y la regla de estipendio. Devuelve valores normalizados. */
   async function normalize(c: PoolClient, b: z.infer<typeof bodySchema>, mustBeActive: boolean) {
@@ -50,21 +51,31 @@ export function movementsRouter(kind: Kind) {
 
   async function existing(c: PoolClient, id: number) {
     const { rows } = await c.query(
-      `SELECT m.id, m.${k.fk} AS "typeId", p.status, p.year, p.month FROM ${k.mov} m JOIN periods p ON p.id = m.period_id WHERE m.id = $1 FOR UPDATE OF m`,
+      `SELECT m.id, m.${k.fk} AS "typeId", m.date, p.status, p.year, p.month FROM ${k.mov} m JOIN periods p ON p.id = m.period_id WHERE m.id = $1 FOR UPDATE OF m`,
       [id],
     );
     if (!rows[0]) throw new HttpError(404, "Movimiento no encontrado.");
     if (rows[0].status !== "OPEN")
       throw new HttpError(409, `El período ${rows[0].year}-${String(rows[0].month).padStart(2, "0")} está cerrado.`);
-    return rows[0] as { id: number; typeId: number };
+    return rows[0] as { id: number; typeId: number; date: string };
+  }
+
+  /**
+   * Fecha del movimiento. Ingreso: la fecha actual al crear, y se conserva al editar (no es editable).
+   * Egreso: la envía el cliente.
+   */
+  function movementDate(b: z.infer<typeof bodySchema>, current?: string) {
+    const date = kind === "income" ? current ?? todayISO() : b.date;
+    if (!date) throw new HttpError(422, "La fecha es obligatoria.");
+    return date;
   }
 
   /** Columnas de la tabla de movimientos a partir del cuerpo validado (los nombres salen del código, no del cliente). */
-  function columns(b: z.infer<typeof bodySchema>, periodId: number, n: Awaited<ReturnType<typeof normalize>>) {
+  function columns(b: z.infer<typeof bodySchema>, periodId: number, date: string, n: Awaited<ReturnType<typeof normalize>>) {
     const data: Record<string, unknown> = {
       [k.fk]: b.typeId,
       period_id: periodId,
-      date: b.date,
+      date,
       amount: b.amount,
       description: n.description,
       responsible_name: b.responsible,
@@ -105,9 +116,10 @@ export function movementsRouter(kind: Kind) {
   r.post("/", async (req, res) => {
     const b = bodySchema.parse(req.body);
     const id = await tx(async (c) => {
-      const periodId = await requireOpenPeriodForDate(c, b.date);
+      const date = movementDate(b);
+      const periodId = await requireOpenPeriodForDate(c, date);
       const n = await normalize(c, b, true);
-      const data = { ...columns(b, periodId, n), created_by: req.user!.id };
+      const data = { ...columns(b, periodId, date, n), created_by: req.user!.id };
       const cols = Object.keys(data);
       const { rows } = await c.query(
         `INSERT INTO ${k.mov} (${cols.join(",")}) VALUES (${cols.map((_, i) => `$${i + 1}`).join(",")}) RETURNING id`,
@@ -123,9 +135,10 @@ export function movementsRouter(kind: Kind) {
     const b = bodySchema.parse(req.body);
     await tx(async (c) => {
       const cur = await existing(c, id);
-      const periodId = await requireOpenPeriodForDate(c, b.date);
+      const date = movementDate(b, cur.date);
+      const periodId = await requireOpenPeriodForDate(c, date);
       const n = await normalize(c, b, b.typeId !== cur.typeId);
-      const data = columns(b, periodId, n);
+      const data = columns(b, periodId, date, n);
       const cols = Object.keys(data);
       await c.query(
         `UPDATE ${k.mov} SET ${cols.map((col, i) => `${col}=$${i + 2}`).join(",")}, updated_at=now() WHERE id=$1`,

@@ -56,6 +56,10 @@ La barra lateral usa un menú con submenús ramificados que se abren **hacia la 
 
 **Parroquia** (`/parish` consulta, `/parish/edit` formulario; tabla `parish` de un solo registro, `GET/PUT /api/parish`): nombre, departamento, ciudad y dirección obligatorios; logo, correo y teléfono opcionales. El logo se reduce a 256 px en el navegador y se guarda como data URL. Se muestra en el menú y en el encabezado de los reportes. Supuesto a validar: la editan sacerdote y administrador; los demás roles la consultan.
 
+## Comprobante de estipendio
+
+Los ingresos de categoría Estipendio se imprimen con un formato propio (`features/stipends/StipendReceipt.tsx`): información de la parroquia + información de la intención, **máximo media hoja carta** (dos por hoja). Lo usan el botón Imprimir del listado de ingresos y el reporte de estipendios (`lib/printStipends.tsx` lo renderiza aparte, oculta la app y fuerza hoja carta y colores claros). En los ingresos la fecha de registro es la fecha actual y no se edita (`APP_TIMEZONE`); la fecha de realización de la intención sí.
+
 ## Manual de usuario
 
 La opción **How to use** (pie del menú) abre `/manual`. El mismo contenido está en `docs/MANUAL_USUARIO.md`.

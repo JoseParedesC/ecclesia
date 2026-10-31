@@ -2,6 +2,13 @@
 
 ## ✅ Implementado
 
+### Estipendios: comprobante impreso (v1.2)
+- [x] `StipendReceipt` (`features/stipends/StipendReceipt.tsx`): parroquia + información de la intención, máximo media hoja carta (`max-h-[4.9in]`), dos por hoja con guía de corte
+- [x] `printStipendReceipts` (`lib/printStipends.tsx`): renderiza aparte, oculta la app al imprimir, hoja carta y colores claros
+- [x] Botón Imprimir por estipendio en el listado de ingresos
+- [x] El reporte de estipendios muestra e imprime ese mismo formato (un comprobante por estipendio)
+- [x] Ingresos: fecha de registro = fecha actual, no editable (backend la fija con `APP_TIMEZONE`); fecha de realización de la intención editable
+
 ### Base de datos
 - [x] **v1.1** Categoría «Intención» renombrada a «Estipendio» (migración automática, conserva datos) y columna `income_types.default_amount` (valor sugerido)
 - [x] Esquema PostgreSQL idempotente (`backend/db/schema.sql`) y script `npm run migrate`
@@ -51,6 +58,10 @@
 - [x] Versión visible en la barra lateral (`package.json` → `__APP_VERSION__`)
 
 ## ⏳ Pendiente
+
+- [ ] **Imprimir en una impresora real / PDF**: confirmar que cada comprobante cabe en media hoja carta con datos largos (mención de 3 líneas, dirección de 2) y que el logo sale bien; ajustar `max-h-[4.9in]` si hace falta
+- [ ] Probar en navegador y contra la base: crear ingreso (fecha de hoy bloqueada), editar (conserva la fecha), imprimir uno y varios, reporte de estipendios con filtros
+- [ ] Decidir si los totales del reporte de estipendios deben imprimirse (hoy solo se ven en pantalla)
 
 - [ ] Probar en el navegador el menú desplegable a la derecha (hover, clic en móvil, teclado y `Esc`) y que el panel no quede tapado por el contenido
 - [ ] Probar la subida del logo y su guardado (el JSON del backend se amplió a 1 MB); confirmar que PUT /parish rechaza imágenes inválidas

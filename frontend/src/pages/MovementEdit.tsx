@@ -5,7 +5,7 @@ import { api, send } from "../api";
 import { PageHeader } from "../components/layout/PageHeader";
 import { Alert, Button, Spinner, useToast } from "../components/ui";
 import { MovementForm, type DateRange, type MovementInput } from "../features/movements/MovementForm";
-import { pad } from "../format";
+import { pad, today } from "../format";
 import type { Movement, Period, TypeRow } from "../types";
 
 /** Pantalla de formulario (crear / editar) de ingresos o egresos. */
@@ -42,6 +42,8 @@ export default function MovementEdit({ kind }: { kind: "incomes" | "expenses" })
   const open = periods.filter((p) => p.status === "OPEN").sort((a, b) => a.year * 12 + a.month - (b.year * 12 + b.month));
   if (!open.length) return <>{header}<Alert tone="warning">No hay períodos abiertos. Abre uno en la sección Períodos para registrar movimientos.</Alert></>;
   if (editing && editing.periodStatus !== "OPEN") return <>{header}<Alert tone="warning">El período de este registro está cerrado: solo lectura.</Alert></>;
+  // Un ingreso nuevo se registra con la fecha actual: el período de hoy debe estar abierto
+  const currentOpen = open.some((p) => `${p.year}-${pad(p.month)}` === today().slice(0, 7));
   const first = open[0], last = open[open.length - 1];
   const range: DateRange = {
     min: `${first.year}-${pad(first.month)}-01`,
@@ -57,6 +59,7 @@ export default function MovementEdit({ kind }: { kind: "incomes" | "expenses" })
   return (
     <>
       {header}
+      {isIncome && !editing && !currentOpen && <Alert tone="warning" className="mb-5">El período de la fecha actual ({today().slice(0, 7)}) no está abierto, así que el ingreso no se podrá registrar. Ábrelo en Períodos.</Alert>}
       <MovementForm types={types} range={range} isIncome={isIncome} editing={editing} onSubmit={save} onCancel={back} />
     </>
   );

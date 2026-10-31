@@ -5,7 +5,10 @@ import { api, send } from "../api";
 import { PageHeader } from "../components/layout/PageHeader";
 import { Alert, Button, Input, Select, useConfirm, useToast } from "../components/ui";
 import { MovementsTable } from "../features/movements/MovementsTable";
+import { receiptNumber } from "../features/stipends/StipendReceipt";
 import { money, periodLabel } from "../format";
+import { printStipendReceipts } from "../lib/printStipends";
+import { useParish } from "../parish";
 import type { Movement, Period, TypeRow } from "../types";
 
 /** Listado de ingresos o egresos. El formulario vive en su propia pantalla (/new y /:id/edit). */
@@ -14,6 +17,7 @@ export default function Movements({ kind }: { kind: "incomes" | "expenses" }) {
   const base = isIncome ? "/incomes" : "/expenses";
   const navigate = useNavigate();
   const toast = useToast();
+  const { parish } = useParish();
   const confirm = useConfirm();
   const [params, setParams] = useSearchParams();
   const [periods, setPeriods] = useState<Period[]>([]);
@@ -91,7 +95,7 @@ export default function Movements({ kind }: { kind: "incomes" | "expenses" }) {
             {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </Select>
         </div>
-        <MovementsTable rows={rows} isIncome={isIncome} onDelete={remove} onEdit={(m) => navigate(`${base}/${m.id}/edit`)} />
+        <MovementsTable rows={rows} isIncome={isIncome} onDelete={remove} onPrint={(m) => void printStipendReceipts([m], parish, `Estipendio ${receiptNumber(m.id)}`)} onEdit={(m) => navigate(`${base}/${m.id}/edit`)} />
       </div>
     </>
   );

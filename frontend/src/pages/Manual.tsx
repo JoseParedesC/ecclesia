@@ -13,7 +13,7 @@ const Section = ({ id, title, children }: { id: string; title: string; children:
 
 const toc = [
   ["login", "Iniciar sesión"], ["roles", "Roles"], ["periodos", "Períodos"], ["movimientos", "Ingresos y egresos"],
-  ["maestros", "Maestros"], ["reportes", "Reportes"], ["usuarios", "Usuarios"], ["parroquia", "Parroquia"], ["tema", "Tema"], ["faq", "Mensajes frecuentes"],
+  ["comprobante", "Comprobante de estipendio"], ["maestros", "Maestros"], ["reportes", "Reportes"], ["usuarios", "Usuarios"], ["parroquia", "Parroquia"], ["tema", "Tema"], ["faq", "Mensajes frecuentes"],
 ] as const;
 
 const faq: [string, string][] = [
@@ -69,12 +69,20 @@ export default function Manual() {
 
         <Section id="movimientos" title="4. Ingresos y egresos">
           <p><b>Listado.</b> Elige el período, busca por responsable, identificación, tipo o descripción, y filtra por tipo. Usa <b>Nuevo ingreso / Nuevo egreso</b> para crear; el lápiz edita y la papelera elimina (solo en períodos abiertos).</p>
-          <p><b>Formulario.</b> Es una pantalla aparte. Datos del movimiento: tipo, fecha (dentro de un período abierto), monto y descripción. Si el tipo es un <b>estipendio</b>, también son obligatorias la fecha en que se realizará la intención y la mención o petición. Si el tipo tiene un <b>valor sugerido</b>, el monto aparece ya escrito y puedes cambiarlo. Los montos se escriben con el símbolo <b>$</b> y separadores de miles; usa la coma (o el punto del teclado numérico) para los centavos.</p>
+          <p><b>Formulario.</b> Es una pantalla aparte. Datos del movimiento: tipo, fecha (dentro de un período abierto), monto y descripción. En <b>ingresos</b> la fecha de registro es la fecha actual y no se puede cambiar (el período de hoy debe estar abierto); en egresos sí eliges la fecha. Si el tipo es un <b>estipendio</b>, también son obligatorias la fecha en que se realizará la intención (esa sí se puede elegir y cambiar) y la mención o petición. Si el tipo tiene un <b>valor sugerido</b>, el monto aparece ya escrito y puedes cambiarlo. Los montos se escriben con el símbolo <b>$</b> y separadores de miles; usa la coma (o el punto del teclado numérico) para los centavos.</p>
           <p><b>Responsable</b> (quien entrega el dinero, o a quien se le paga):</p>
           <ul>
             <li>Obligatorios: responsable, dirección, tipo de identificación (<b>NIT, CC o TI</b>), número de identificación y teléfono de contacto.</li>
             <li>Opcional: correo.</li>
             <li>CC y TI: solo dígitos. NIT: dígitos con guion y dígito de verificación opcional (ej. <code>900123456-7</code>).</li>
+          </ul>
+        </Section>
+
+        <Section id="comprobante" title="Comprobante de estipendio">
+          <p>Cada estipendio tiene un formato de impresión propio con la información de la parroquia y de la intención (tipo, fechas, mención o petición, responsable, identificación, contacto, valor, quién lo registró y espacio para «Recibido por»). Ocupa <b>como máximo media hoja carta</b>: al imprimir varios salen dos por hoja.</p>
+          <ul>
+            <li>En el listado de <b>Ingresos</b>, el botón de la impresora de cada estipendio imprime su comprobante (también en períodos cerrados).</li>
+            <li>En <b>Reportes → Estipendios</b>, «Imprimir» saca todos los comprobantes del filtro con este mismo formato.</li>
           </ul>
         </Section>
 
@@ -90,7 +98,7 @@ export default function Manual() {
         <Section id="reportes" title="6. Reportes">
           <ul>
             <li><b>Ingresos / Egresos:</b> rango de fechas, categoría y tipo, con responsable e identificación.</li>
-            <li><b>Estipendios:</b> por fecha de realización de la intención o de registro.</li>
+            <li><b>Estipendios:</b> por fecha de realización de la intención o de registro. Muestra e imprime un <b>comprobante por estipendio</b>, con el mismo formato del listado de ingresos.</li>
             <li><b>Consolidado mensual:</b> ingresos, egresos y saldo del período.</li>
           </ul>
           <p>Con <b>Imprimir</b> se abre el diálogo del navegador; ahí puedes elegir «Guardar como PDF».</p>

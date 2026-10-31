@@ -1,11 +1,11 @@
-import { Pencil, ReceiptText, Trash2 } from "lucide-react";
+import { Pencil, Printer, ReceiptText, Trash2 } from "lucide-react";
 import { Badge, Button, EmptyState, Table, TableWrap, Td, Th, Tr } from "../../components/ui";
 import { money } from "../../format";
 import type { Movement } from "../../types";
 
-interface Props { rows: Movement[]; isIncome: boolean; onEdit: (m: Movement) => void; onDelete: (m: Movement) => void }
+interface Props { rows: Movement[]; isIncome: boolean; onEdit: (m: Movement) => void; onDelete: (m: Movement) => void; onPrint?: (m: Movement) => void }
 
-export function MovementsTable({ rows, isIncome, onEdit, onDelete }: Props) {
+export function MovementsTable({ rows, isIncome, onEdit, onDelete, onPrint }: Props) {
   if (!rows.length)
     return <TableWrap><EmptyState icon={ReceiptText} title="Sin registros">No hay movimientos para el período y la búsqueda elegidos.</EmptyState></TableWrap>;
   return (
@@ -37,12 +37,17 @@ export function MovementsTable({ rows, isIncome, onEdit, onDelete }: Props) {
               <Td className="max-w-xs text-muted">{m.description ?? "—"}</Td>
               <Td className="whitespace-nowrap text-right font-medium tabular-nums">{money(m.amount)}</Td>
               <Td>
-                {m.periodStatus === "OPEN" && (
-                  <div className="flex justify-end gap-1">
-                    <Button size="sm" variant="ghost" aria-label={`Editar ${m.typeName}`} onClick={() => onEdit(m)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button size="sm" variant="ghost" aria-label={`Eliminar ${m.typeName}`} onClick={() => onDelete(m)} className="text-danger hover:bg-danger-soft"><Trash2 className="h-3.5 w-3.5" /></Button>
-                  </div>
-                )}
+                <div className="flex justify-end gap-1">
+                  {onPrint && m.categoryCode === "ESTIPENDIO" && (
+                    <Button size="sm" variant="ghost" aria-label={`Imprimir comprobante de ${m.typeName}`} title="Imprimir comprobante (media hoja carta)" onClick={() => onPrint(m)}><Printer className="h-3.5 w-3.5" /></Button>
+                  )}
+                  {m.periodStatus === "OPEN" && (
+                    <>
+                      <Button size="sm" variant="ghost" aria-label={`Editar ${m.typeName}`} onClick={() => onEdit(m)}><Pencil className="h-3.5 w-3.5" /></Button>
+                      <Button size="sm" variant="ghost" aria-label={`Eliminar ${m.typeName}`} onClick={() => onDelete(m)} className="text-danger hover:bg-danger-soft"><Trash2 className="h-3.5 w-3.5" /></Button>
+                    </>
+                  )}
+                </div>
               </Td>
             </Tr>
           ))}

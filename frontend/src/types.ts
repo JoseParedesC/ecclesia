@@ -23,6 +23,7 @@ export interface Movement {
   /** Datos del responsable (los registros anteriores a esta versión pueden venir vacíos). */
   responsible: string | null; address: string | null; idType: IdType | null; idNumber: string | null;
   phone: string | null; email: string | null;
+  createdAt: string | null; registeredBy: string | null;
 }
 export interface Totals {
   estipendio: number; donacion: number; ingresos: number; servicio: number; gasto: number; egresos: number; saldo: number;
@@ -35,6 +36,13 @@ export interface ReportRow {
   description: string | null; intentionDate: string | null; amount: number;
   responsible?: string | null; idType?: IdType | null; idNumber?: string | null;
 }
+/** Lo que necesita el comprobante impreso de un estipendio (sale del listado de ingresos y del reporte de estipendios). */
+export interface StipendReceiptData {
+  id: number; typeName: string; date: string; intentionDate: string | null; description: string | null; amount: number;
+  responsible: string | null; address: string | null; idType: IdType | null; idNumber: string | null;
+  phone: string | null; email: string | null; createdAt: string | null; registeredBy: string | null;
+}
 export interface ReportTotals { count: number; total: number; byCategory: { code: string; name: string; count: number; total: number }[] }
+export interface StipendsResult { rows: StipendReceiptData[]; totals: ReportTotals }
 export interface ReportResult { rows: ReportRow[]; totals: ReportTotals }
 export interface Consolidado { period: Period; incomes: ReportRow[]; expenses: ReportRow[]; totals: Totals }

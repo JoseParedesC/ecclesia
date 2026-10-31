@@ -41,7 +41,8 @@ Cada módulo tiene **dos pantallas**: el listado y el formulario.
 ### Formulario
 **Datos del movimiento:** tipo, fecha (dentro de un período abierto), monto y descripción.
 
-- Si el tipo es un **estipendio**, también son obligatorios la **fecha en que se realizará** la intención y la **mención o petición**.
+- **Ingresos:** la **fecha de registro** es la fecha actual y no se puede cambiar; el período de hoy debe estar abierto. Los **egresos** sí permiten elegir la fecha.
+- Si el tipo es un **estipendio**, también son obligatorios la **fecha en que se realizará** la intención (esta sí se puede elegir y cambiar) y la **mención o petición**.
 - Si el tipo tiene un **valor sugerido**, el monto aparece ya escrito al elegirlo y puedes cambiarlo.
 - Los montos se escriben con el símbolo **$** y separadores de miles, alineados a la derecha; usa la coma (o el punto del teclado numérico) para los centavos.
 
@@ -58,6 +59,13 @@ Cada módulo tiene **dos pantallas**: el listado y el formulario.
 
 Al guardar vuelves al listado.
 
+### Comprobante de estipendio
+
+Cada estipendio tiene un formato de impresión propio con la información de la parroquia y de la intención (tipo, fechas, mención o petición, responsable, identificación, contacto, valor, quién lo registró y espacio para «Recibido por»). Ocupa **como máximo media hoja carta**: al imprimir varios salen dos por hoja.
+
+- En el listado de **Ingresos**, el botón de la impresora de cada estipendio imprime su comprobante (también en períodos cerrados).
+- En **Reportes → Estipendios**, «Imprimir» saca todos los comprobantes del filtro, con este mismo formato.
+
 ## 5. Maestros
 
 En **Maestros** se administran los **tipos de ingreso** y **tipos de egreso**: código, nombre, categoría (ingreso: Estipendio o Donación; egreso: Servicio o Gasto) y cuenta contable.
@@ -72,7 +80,7 @@ En **Maestros** se administran los **tipos de ingreso** y **tipos de egreso**: c
 En **Reportes** elige el filtro y pulsa generar:
 
 - **Ingresos / Egresos:** rango de fechas, categoría y tipo. Incluye responsable e identificación.
-- **Estipendios:** por fecha de realización de la intención o de registro.
+- **Estipendios:** por fecha de realización de la intención o de registro. Muestra e imprime un **comprobante por estipendio** (ver «Comprobante de estipendio»).
 - **Consolidado mensual:** ingresos, egresos y saldo del período.
 
 Con **Imprimir** se abre el diálogo del navegador; ahí puedes elegir **Guardar como PDF**.

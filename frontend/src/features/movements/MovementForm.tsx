@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { Alert, Button, Card, CardBody, CardHeader, Input, MoneyInput, Select, Textarea } from "../../components/ui";
-import { pad } from "../../format";
+import { pad, today } from "../../format";
 import { ID_TYPES, type IdType, type Movement, type TypeRow } from "../../types";
 
 export interface MovementInput {
-  typeId: number; date: string; amount: number; description: string | null; intentionDate?: string | null;
+  typeId: number; date?: string; amount: number; description: string | null; intentionDate?: string | null;
   responsible: string; address: string; idType: IdType; idNumber: string; phone: string; email: string | null;
 }
 /** Rango de fechas permitido: de la primera a la última fecha de los períodos abiertos. */
@@ -33,7 +33,8 @@ export function idNumberError(idType: IdType | "", value: string): string | unde
 /** Formulario de ingreso/egreso. Vive en su propia pantalla, separada del listado. */
 export function MovementForm({ types, range, isIncome, editing, onSubmit, onCancel }: Props) {
   const [typeId, setTypeId] = useState(editing ? String(editing.typeId) : "");
-  const [date, setDate] = useState(editing?.date ?? defaultDate(range));
+  // Ingresos: la fecha de registro es la fecha actual y no se edita. Egresos: la elige quien registra.
+  const [date, setDate] = useState(editing?.date ?? (isIncome ? today() : defaultDate(range)));
   const [amount, setAmount] = useState(editing ? String(editing.amount) : "");
   // Último valor sugerido que se cargó solo; sirve para saber si la persona ya escribió su propio monto
   const [suggested, setSuggested] = useState("");
@@ -68,8 +69,10 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
   function validate(): Errors {
     const e: Errors = {};
     if (!typeId) e.typeId = "Selecciona un tipo";
-    if (!date) e.date = "La fecha es obligatoria";
-    else if (date < range.min || date > range.max) e.date = "La fecha debe estar dentro de un período abierto";
+    if (!isIncome) {
+      if (!date) e.date = "La fecha es obligatoria";
+      else if (date < range.min || date > range.max) e.date = "La fecha debe estar dentro de un período abierto";
+    }
     if (!(Number(amount) > 0)) e.amount = "El monto debe ser mayor que cero";
     if (isStipend && !intentionDate) e.intentionDate = "Indica la fecha en que se realizará";
     if (isStipend && !description.trim()) e.description = "La mención o petición es obligatoria";
@@ -92,7 +95,7 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
     setSaving(true);
     try {
       await onSubmit({
-        typeId: Number(typeId), date, amount: Number(amount), description: description.trim() || null,
+        typeId: Number(typeId), ...(isIncome ? {} : { date }), amount: Number(amount), description: description.trim() || null,
         ...(isStipend ? { intentionDate: intentionDate || null } : {}),
         responsible: responsible.trim(), address: address.trim(), idType: idType as IdType, idNumber: idNumber.trim(),
         phone: phone.trim(), email: email.trim() || null,
@@ -114,13 +117,17 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
               <option value="">Selecciona…</option>
               {options.map((t) => <option key={t.id} value={t.id}>{t.name} · {t.categoryName}</option>)}
             </Select>
-            <Input label="Fecha" type="date" required min={range.min} max={range.max} value={date} error={errors.date} onChange={(e) => setDate(e.target.value)} />
+            {isIncome ? (
+              <Input label="Fecha de registro" type="date" disabled readOnly value={date} hint="Es la fecha actual y no se puede cambiar." />
+            ) : (
+              <Input label="Fecha" type="date" required min={range.min} max={range.max} value={date} error={errors.date} onChange={(e) => setDate(e.target.value)} />
+            )}
             <MoneyInput
               label="Monto" required value={amount} error={errors.amount} onValueChange={setAmount}
               hint={amount !== "" && amount === suggested ? "Valor sugerido para este tipo; puedes modificarlo." : undefined}
             />
             {isStipend && (
-              <Input label="Fecha en que se realizará" type="date" required value={intentionDate} error={errors.intentionDate} onChange={(e) => setIntentionDate(e.target.value)} className="animate-slide-down" />
+              <Input label="Fecha en que se realizará la intención" type="date" required hint="Puedes elegirla o cambiarla." value={intentionDate} error={errors.intentionDate} onChange={(e) => setIntentionDate(e.target.value)} className="animate-slide-down" />
             )}
             <Textarea
               label={isStipend ? "Mención o petición" : "Descripción"} rows={2} required={isStipend}
