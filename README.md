@@ -8,7 +8,7 @@ Control de ingresos y egresos de una parroquia, con cierre de mensual y consolid
 ## Puesta en marcha
 
 1. `docker compose up -d` (PostgreSQL) y copia `backend/.env.example` → `backend/.env`; completa `BOOTSTRAP_ADMIN_EMAIL` y las credenciales de Firebase Admin.
-2. `cd backend && npm install && npm run migrate && npm run dev`
+2. `cd backend && npm install && npm run dev` (al arrancar crea las tablas solas; también puedes correr `npm run migrate`. Con `npm run build && npm start` pasa igual; para desactivarlo usa `AUTO_MIGRATE=false`)
 3. Copia `frontend/.env.example` → `frontend/.env` con los datos de tu app web de Firebase (Authentication → proveedor Google activado).
 4. `cd frontend && npm install && npm run dev` → http://localhost:5173
 

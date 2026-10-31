@@ -4,10 +4,14 @@ import { authenticate, requireRole } from "./auth.js";
 import { config } from "./config.js";
 import { pool } from "./db.js";
 import { errorHandler } from "./errors.js";
+import { runMigrations } from "./migrate.js";
 import { mastersRouter } from "./routes/masters.js";
 import { movementsRouter } from "./routes/movements.js";
 import { periodsRouter } from "./routes/periods.js";
 import { usersRouter } from "./routes/users.js";
+
+// Crea las tablas si no existen (desactivar con AUTO_MIGRATE=false)
+if (process.env.AUTO_MIGRATE !== "false") await runMigrations();
 
 if (config.bootstrapAdmin) {
   const { rowCount } = await pool.query("SELECT 1 FROM users LIMIT 1");

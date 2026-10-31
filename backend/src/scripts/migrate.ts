@@ -1,7 +1,5 @@
-import { readFileSync } from "node:fs";
 import { pool } from "../db.js";
+import { runMigrations } from "../migrate.js";
 
-const sql = readFileSync(new URL("../../db/schema.sql", import.meta.url), "utf8");
-await pool.query(sql);
-console.log("Migración aplicada.");
+await runMigrations();
 await pool.end();
