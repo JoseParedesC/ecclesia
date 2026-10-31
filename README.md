@@ -1,6 +1,8 @@
-# Finanzas parroquiales
+# Ecclesia
 
-Control de ingresos y egresos de una parroquia, con cierre de mensual y consolidado descargable.
+_Finanzas parroquiales_
+
+Control de ingresos y egresos de una parroquia, con cierre mensual y consolidado descargable.
 
 - **frontend/** React + Vite + TypeScript. Maestros con `@joseparedesc/master-crud`.
 - **backend/** Node + Express + TypeScript + PostgreSQL. Verifica tokens de Firebase (Google).

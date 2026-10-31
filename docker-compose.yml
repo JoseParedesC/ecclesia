@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16
-    environment: { POSTGRES_USER: iglesia, POSTGRES_PASSWORD: iglesia, POSTGRES_DB: iglesia }
+    environment: { POSTGRES_USER: ecclesia, POSTGRES_PASSWORD: ecclesia, POSTGRES_DB: ecclesia }
     ports: ["5432:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
 volumes:

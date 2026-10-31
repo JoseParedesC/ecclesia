@@ -1,4 +1,4 @@
-# Estado del proyecto — Finanzas parroquiales
+# Estado del proyecto — Ecclesia
 
 ## ✅ Implementado
 
