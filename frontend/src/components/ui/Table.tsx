@@ -9,6 +9,6 @@ export const Th = ({ className, ...rest }: ThHTMLAttributes<HTMLTableCellElement
   <th className={cn("whitespace-nowrap border-b border-line bg-mist/60 px-4 py-3 text-xs font-semibold text-muted", className)} {...rest} />
 );
 export const Tr = ({ className, ...rest }: HTMLAttributes<HTMLTableRowElement>) => (
-  <tr className={cn("animate-fade-in border-b border-line last:border-0 transition-colors duration-fast hover:bg-mist/50", className)} {...rest} />
+  <tr className={cn("animate-fade-in print:break-inside-avoid border-b border-line last:border-0 transition-colors duration-fast hover:bg-mist/50", className)} {...rest} />
 );
 export const Td = ({ className, ...rest }: TdHTMLAttributes<HTMLTableCellElement>) => <td className={cn("px-4 py-3 align-top", className)} {...rest} />;

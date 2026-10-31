@@ -8,6 +8,7 @@ import { runMigrations } from "./migrate.js";
 import { mastersRouter } from "./routes/masters.js";
 import { movementsRouter } from "./routes/movements.js";
 import { periodsRouter } from "./routes/periods.js";
+import { reportsRouter } from "./routes/reports.js";
 import { usersRouter } from "./routes/users.js";
 
 // Crea las tablas si no existen (desactivar con AUTO_MIGRATE=false)
@@ -45,6 +46,7 @@ api.use("/expense-types", mastersRouter("expense"));
 api.use("/incomes", movementsRouter("income"));
 api.use("/expenses", movementsRouter("expense"));
 api.use("/periods", periodsRouter);
+api.use("/reports", reportsRouter);
 api.use("/users", requireRole("administrador", "sacerdote", "secretario"), usersRouter);
 app.use("/api", api);
 

@@ -10,7 +10,7 @@ export class HttpError extends Error {
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof HttpError) return void res.status(err.status).json({ message: err.message, ...err.extra });
   if (err instanceof ZodError)
-    return void res.status(422).json({ message: err.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") });
+    return void res.status(422).json({ message: err.issues.map((i) => (i.path.length ? `${i.path.join(".")}: ${i.message}` : i.message)).join("; ") });
   const code = (err as { code?: string }).code;
   if (code === "23505") return void res.status(409).json({ message: "Ya existe un registro con ese valor." });
   if (code === "23503") return void res.status(409).json({ message: "El registro está relacionado con otros datos." });

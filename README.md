@@ -38,6 +38,10 @@ Cada rol solo ve y gestiona (cambiar rol, activar/desactivar) los roles que pued
 | Cuenta contable de maestros: la definen el contador y el administrador | `routes/masters.ts` + `masterConfigs.ts` |
 | Consolidado mensual (CSV, separador `;`, con BOM para Excel) | `services/consolidado.ts` |
 
+## Reportes e impresión
+
+Sección **Reportes** (todos los roles): ingresos y egresos (rango de fechas, categoría y tipo), intenciones (por fecha de realización o de registro) y consolidado mensual (también en CSV). El botón **Imprimir** abre el diálogo del navegador (ahí se puede elegir "Guardar como PDF"); solo se imprime la hoja del reporte, siempre en colores claros.
+
 ## Supuestos que conviene validar
 
 - Cerrar y abrir períodos lo puede hacer cualquier rol; solo **reabrir** está restringido.

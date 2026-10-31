@@ -49,6 +49,10 @@ export default {
       addBase({
         ":root": { ...colorVars("light"), ...shadowVars("light"), colorScheme: "light" },
         ':root[data-theme="dark"]': { ...colorVars("dark"), ...shadowVars("dark"), colorScheme: "dark" },
+        // Al imprimir siempre se usa la paleta clara, aunque la pantalla esté en oscuro
+        "@media print": {
+          ':root, :root[data-theme="dark"]': { ...colorVars("light"), ...shadowVars("light"), colorScheme: "light" },
+        },
         "@media (prefers-reduced-motion: reduce)": {
           "*, *::before, *::after": { animationDuration: "0.01ms !important", animationIterationCount: "1 !important", transitionDuration: "0.01ms !important", scrollBehavior: "auto !important" },
         },

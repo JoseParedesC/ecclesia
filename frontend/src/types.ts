@@ -16,3 +16,11 @@ export interface Totals {
 }
 
 export interface UserRow { id: number; email: string; name: string | null; role: Role; active: boolean }
+
+export interface ReportRow {
+  id: number; date: string; type: string; category: string; categoryName: string; account?: string | null;
+  description: string | null; intentionDate: string | null; amount: number;
+}
+export interface ReportTotals { count: number; total: number; byCategory: { code: string; name: string; count: number; total: number }[] }
+export interface ReportResult { rows: ReportRow[]; totals: ReportTotals }
+export interface Consolidado { period: Period; incomes: ReportRow[]; expenses: ReportRow[]; totals: Totals }

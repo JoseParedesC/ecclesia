@@ -19,11 +19,13 @@
 - [x] Intención: fecha de realización y descripción obligatorias
 - [x] Períodos: abrir, cerrar, reabrir; máx. 2 abiertos y consecutivos; reabrir negado al secretario
 - [x] Resumen por período y consolidado descargable (CSV)
+- [x] Endpoints de reportes: movimientos filtrados, intenciones y consolidado en JSON
 - [x] Gestión de usuarios por API con permisos por rol (admin: todos; sacerdote: contador y secretario; secretario: secretario; contador: ninguno)
 - [x] Cuenta contable editable por contador y administrador
 
 ### Frontend (compila con `tsc` y `vite build`)
 - [x] Login con Google (Firebase) y control de sesión
+- [x] Módulo de Reportes imprimibles: ingresos y egresos (fechas/categoría/tipo), intenciones por rango de fechas, consolidado mensual
 - [x] Pantalla de Períodos (abrir, cerrar, reabrir según rol, resumen, descargar consolidado)
 - [x] Pantalla de Ingresos y Egresos con campos condicionales de intención
 - [x] Pantalla de Usuarios (según rol): agregar, cambiar rol, activar/desactivar
@@ -38,7 +40,7 @@
 - [ ] Probar el login real con Firebase (proyecto, dominio autorizado, credenciales Admin)
 - [ ] Consolidado en Excel (.xlsx) y/o PDF; hoy es CSV
 - [ ] Pantalla para consultar el historial de aperturas/cierres/reaperturas (`period_events` ya se guarda)
-- [ ] Reportes: intenciones por fecha de celebración, comparativo entre meses
+- [ ] Reportes adicionales: comparativo entre meses y exportación de los reportes filtrados a CSV/Excel
 - [ ] Pruebas automáticas (unitarias de reglas de períodos y de integración de la API)
 - [ ] Migraciones versionadas (hoy un único `schema.sql`)
 - [ ] Despliegue: Dockerfiles, CI, variables de producción, HTTPS, CORS restrictivo

@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Masters from "./pages/Masters";
 import Movements from "./pages/Movements";
 import Periods from "./pages/Periods";
+import Reports from "./pages/Reports";
 import Users from "./pages/Users";
 import { ThemeProvider } from "./theme/ThemeProvider";
 
@@ -19,6 +20,7 @@ function Gate() {
         <Route path="/periods" element={<Periods />} />
         <Route path="/incomes" element={<Movements kind="incomes" />} />
         <Route path="/expenses" element={<Movements kind="expenses" />} />
+        <Route path="/reports" element={<Reports />} />
         <Route path="/masters" element={<Masters />} />
         <Route path="/users" element={me.creatableRoles.length > 0 ? <Users /> : <Navigate to="/periods" replace />} />
         <Route path="*" element={<Navigate to="/periods" replace />} />

@@ -77,6 +77,11 @@ periodsRouter.get("/:id/summary", async (req, res) => {
   res.json({ period: d.period, totals: d.totals });
 });
 
+// Consolidado completo del mes en JSON (para la hoja imprimible)
+periodsRouter.get("/:id/consolidado", async (req, res) => {
+  res.json(await buildConsolidado(Number(req.params.id)));
+});
+
 // Consolidado del mes (CSV)
 periodsRouter.get("/:id/consolidado.csv", async (req, res) => {
   const d = await buildConsolidado(Number(req.params.id));
