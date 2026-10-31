@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, LogOut, Menu, Settings2, X, type LucideIcon } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, LogOut, Menu, Settings2, Users, X, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth";
@@ -7,14 +7,15 @@ import { Badge, Button } from "../ui";
 import { Brand } from "./Brand";
 import { ThemeToggle } from "./ThemeToggle";
 
-const nav: { to: string; label: string; Icon: LucideIcon }[] = [
+const nav: { to: string; label: string; Icon: LucideIcon; needsUsers?: boolean }[] = [
   { to: "/periods", label: "Períodos", Icon: CalendarDays },
   { to: "/incomes", label: "Ingresos", Icon: ArrowDownToLine },
   { to: "/expenses", label: "Egresos", Icon: ArrowUpFromLine },
   { to: "/masters", label: "Maestros", Icon: Settings2 },
+  { to: "/users", label: "Usuarios", Icon: Users, needsUsers: true },
 ];
 
-function NavItem({ to, label, Icon }: (typeof nav)[number]) {
+function NavItem({ to, label, Icon }: Omit<(typeof nav)[number], "needsUsers">) {
   return (
     <NavLink
       to={to}
@@ -54,7 +55,7 @@ export function AppShell() {
           <Brand />
           <button aria-label="Cerrar menú" onClick={() => setOpen(false)} className="rounded p-1 text-muted hover:bg-mist lg:hidden"><X className="h-5 w-5" /></button>
         </div>
-        <nav aria-label="Principal" className="flex flex-col gap-1">{nav.map((n) => <NavItem key={n.to} {...n} />)}</nav>
+        <nav aria-label="Principal" className="flex flex-col gap-1">{nav.filter((n) => !n.needsUsers || (me?.creatableRoles.length ?? 0) > 0).map(({ needsUsers: _u, ...n }) => <NavItem key={n.to} {...n} />)}</nav>
         <div className="mt-auto flex flex-col gap-3 rounded-lg bg-mist/70 p-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{me?.name ?? me?.email}</p>

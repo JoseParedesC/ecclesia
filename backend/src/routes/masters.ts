@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { MASTER_WRITE_ROLES, requireRole } from "../auth.js";
+import { ACCOUNT_ROLES, MASTER_WRITE_ROLES, requireRole } from "../auth.js";
 import { pool } from "../db.js";
 import { HttpError } from "../errors.js";
 import { KINDS, type Kind } from "../kinds.js";
@@ -61,8 +61,8 @@ export function mastersRouter(kind: Kind) {
 
   r.post("/", write, async (req, res) => {
     const b = bodySchema.parse(req.body);
-    // Solo el contador define la cuenta contable
-    const account = req.user!.role === "contador" ? b.accountCode || null : null;
+    // Solo contador y administrador definen la cuenta contable
+    const account = ACCOUNT_ROLES.includes(req.user!.role) ? b.accountCode || null : null;
     const { rows } = await pool.query(
       `INSERT INTO ${k.type} (code, name, category_id, account_code, active, created_by, updated_by)
        VALUES ($1,$2,$3,$4,$5,$6,$6) RETURNING id`,
@@ -80,7 +80,7 @@ export function mastersRouter(kind: Kind) {
     if (b.code !== undefined && b.code !== current.code && (await refCount(id)) > 0)
       throw new HttpError(409, "No se puede cambiar el código de un registro que ya tiene movimientos.");
     const account =
-      req.user!.role === "contador" && b.accountCode !== undefined ? b.accountCode || null : current.accountCode;
+      ACCOUNT_ROLES.includes(req.user!.role) && b.accountCode !== undefined ? b.accountCode || null : current.accountCode;
     await pool.query(
       `UPDATE ${k.type} SET code=$2, name=$3, category_id=$4, account_code=$5, updated_by=$6, updated_at=now() WHERE id=$1`,
       [id, b.code ?? current.code, b.name ?? current.name, b.categoryId ?? current.categoryId, account, req.user!.id],

@@ -35,7 +35,7 @@ export default function Masters() {
   const [kind, setKind] = useState<"income" | "expense">("income");
   return (
     <>
-      <PageHeader title="Maestros" description="Tipos de ingreso y de egreso con su categoría. La cuenta contable solo la define el contador." />
+      <PageHeader title="Maestros" description="Tipos de ingreso y de egreso con su categoría. La cuenta contable la definen el contador y el administrador." />
       <div className="mb-5">
         <Tabs value={kind} onChange={setKind} items={[{ value: "income", label: "Ingresos" }, { value: "expense", label: "Egresos" }]} />
       </div>

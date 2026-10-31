@@ -1,6 +1,6 @@
 import type { MasterEntity } from "@joseparedesc/master-crud";
 export type Role = "sacerdote" | "contador" | "administrador" | "secretario";
-export interface Me { id: number; email: string; name: string | null; role: Role }
+export interface Me { id: number; email: string; name: string | null; role: Role; creatableRoles: Role[] }
 export interface Period { id: number; year: number; month: number; status: "OPEN" | "CLOSED"; closedAt: string | null }
 export interface Category { id: number; code: string; name: string }
 export interface TypeRow extends MasterEntity {
@@ -14,3 +14,5 @@ export interface Movement {
 export interface Totals {
   intencion: number; donacion: number; ingresos: number; servicio: number; gasto: number; egresos: number; saldo: number;
 }
+
+export interface UserRow { id: number; email: string; name: string | null; role: Role; active: boolean }

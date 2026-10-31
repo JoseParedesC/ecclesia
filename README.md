@@ -15,7 +15,16 @@ Control de ingresos y egresos de una parroquia, con cierre mensual y consolidado
 4. `cd frontend && npm install && npm run dev` → http://localhost:5173
 
 En cada arranque el backend asegura que el correo de `BOOTSTRAP_ADMIN_EMAIL` exista como administrador activo (si lo corriges, se registra en el siguiente arranque; la fila del correo anterior no se borra).
-El primer inicio de sesión debe hacerse con ese correo. Los demás usuarios se registran con `POST /api/users` (solo administrador) indicando correo y rol.
+El primer inicio de sesión debe hacerse con ese correo. Los demás usuarios se registran en la sección **Usuarios** (correo de Google y rol). Quién puede crear a quién:
+
+| Quien crea | Puede crear |
+|---|---|
+| administrador | todos los roles |
+| sacerdote | contador y secretario |
+| secretario | secretario |
+| contador | nadie (no ve la sección) |
+
+Cada rol solo ve y gestiona (cambiar rol, activar/desactivar) los roles que puede crear. Nadie puede cambiar su propio rol ni desactivarse.
 
 ## Reglas de negocio implementadas
 
@@ -26,7 +35,7 @@ El primer inicio de sesión debe hacerse con ese correo. Los demás usuarios se 
 | Máx. 2 períodos abiertos y consecutivos (al abrir y al reabrir) | `services/periods.ts` (con lock transaccional) |
 | Reabrir: solo sacerdote, contador, administrador | `auth.ts` → `REOPEN_ROLES` |
 | Solo se registra/edita/borra en períodos abiertos; el período sale de la fecha | `routes/movements.ts` |
-| Cuenta contable de maestros: solo la define el contador | `routes/masters.ts` + `masterConfigs.ts` |
+| Cuenta contable de maestros: la definen el contador y el administrador | `routes/masters.ts` + `masterConfigs.ts` |
 | Consolidado mensual (CSV, separador `;`, con BOM para Excel) | `services/consolidado.ts` |
 
 ## Supuestos que conviene validar

@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import { authenticate, requireRole } from "./auth.js";
+import { CREATABLE_ROLES, authenticate, requireRole } from "./auth.js";
 import { config } from "./config.js";
 import { pool } from "./db.js";
 import { errorHandler } from "./errors.js";
@@ -35,7 +35,7 @@ app.get("/api/health", (_req, res) => void res.json({ ok: true }));
 
 const api = express.Router();
 api.use(authenticate);
-api.get("/me", (req, res) => void res.json(req.user));
+api.get("/me", (req, res) => void res.json({ ...req.user, creatableRoles: CREATABLE_ROLES[req.user!.role] }));
 api.get("/categories/:kind", async (req, res) => {
   const table = req.params.kind === "income" ? "income_categories" : "expense_categories";
   res.json((await pool.query(`SELECT id, code, name FROM ${table} ORDER BY id`)).rows);
@@ -45,7 +45,7 @@ api.use("/expense-types", mastersRouter("expense"));
 api.use("/incomes", movementsRouter("income"));
 api.use("/expenses", movementsRouter("expense"));
 api.use("/periods", periodsRouter);
-api.use("/users", requireRole("administrador"), usersRouter);
+api.use("/users", requireRole("administrador", "sacerdote", "secretario"), usersRouter);
 app.use("/api", api);
 
 app.use(errorHandler);

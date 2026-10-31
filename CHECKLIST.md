@@ -19,13 +19,15 @@
 - [x] Intención: fecha de realización y descripción obligatorias
 - [x] Períodos: abrir, cerrar, reabrir; máx. 2 abiertos y consecutivos; reabrir negado al secretario
 - [x] Resumen por período y consolidado descargable (CSV)
-- [x] Gestión de usuarios por API (solo administrador)
+- [x] Gestión de usuarios por API con permisos por rol (admin: todos; sacerdote: contador y secretario; secretario: secretario; contador: ninguno)
+- [x] Cuenta contable editable por contador y administrador
 
 ### Frontend (compila con `tsc` y `vite build`)
 - [x] Login con Google (Firebase) y control de sesión
 - [x] Pantalla de Períodos (abrir, cerrar, reabrir según rol, resumen, descargar consolidado)
 - [x] Pantalla de Ingresos y Egresos con campos condicionales de intención
-- [x] Pantalla de Maestros con `@joseparedesc/master-crud` (campo cuenta contable solo para contador)
+- [x] Pantalla de Usuarios (según rol): agregar, cambiar rol, activar/desactivar
+- [x] Pantalla de Maestros con `@joseparedesc/master-crud` (campo cuenta contable solo para contador y administrador)
 - [x] Tailwind configurado con los tokens que exige el paquete de maestros
 - [x] Archivo central de estilos (`theme.tokens.json`) y tema claro/oscuro/sistema
 - [x] Jerarquía ui → layout → features → pages, con transiciones suaves, toasts y diálogos de confirmación
@@ -34,7 +36,6 @@
 
 - [ ] Revisar visualmente la UI en el navegador (claro y oscuro, móvil y escritorio); aquí solo se verificó que compila y que el CSS se genera
 - [ ] Probar el login real con Firebase (proyecto, dominio autorizado, credenciales Admin)
-- [ ] Pantalla de administración de usuarios y roles (hoy solo existe la API)
 - [ ] Consolidado en Excel (.xlsx) y/o PDF; hoy es CSV
 - [ ] Pantalla para consultar el historial de aperturas/cierres/reaperturas (`period_events` ya se guarda)
 - [ ] Reportes: intenciones por fecha de celebración, comparativo entre meses

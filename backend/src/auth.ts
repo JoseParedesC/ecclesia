@@ -41,6 +41,16 @@ export const requireRole =
     next();
   };
 
+/** Qué roles puede crear/gestionar cada rol (el contador no gestiona usuarios). */
+export const CREATABLE_ROLES: Record<Role, Role[]> = {
+  administrador: ["administrador", "sacerdote", "contador", "secretario"],
+  sacerdote: ["contador", "secretario"],
+  secretario: ["secretario"],
+  contador: [],
+};
+
 /** secretario NO puede reabrir períodos */
 export const REOPEN_ROLES: Role[] = ["sacerdote", "contador", "administrador"];
+/** roles que pueden definir la cuenta contable de los maestros */
+export const ACCOUNT_ROLES: Role[] = ["contador", "administrador"];
 export const MASTER_WRITE_ROLES: Role[] = ["sacerdote", "contador", "administrador"];

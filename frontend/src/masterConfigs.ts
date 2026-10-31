@@ -5,7 +5,7 @@ import type { Category, Role, TypeRow } from "./types";
 /**
  * Config de los maestros de Ingresos y Egresos.
  *  - La categoría sale de la base de datos (opciones cargadas desde la API).
- *  - "Cuenta contable" solo aparece para el rol contador (el backend también lo exige).
+ *  - "Cuenta contable" solo aparece para contador y administrador (el backend también lo exige).
  */
 export function buildMasterConfig(kind: "income" | "expense", categories: Category[], role: Role): MasterCrudConfig<TypeRow> {
   const isIncome = kind === "income";
@@ -29,8 +29,8 @@ export function buildMasterConfig(kind: "income" | "expense", categories: Catego
         name: "categoryId", label: "Categoría", type: "select", required: true,
         options: categories.map((c) => ({ value: String(c.id), label: c.name })),
       },
-      ...(role === "contador"
-        ? [{ name: "accountCode" as const, label: "Cuenta contable", type: "text" as const, helperText: "Solo el contador puede definirla." }]
+      ...(role === "contador" || role === "administrador"
+        ? [{ name: "accountCode" as const, label: "Cuenta contable", type: "text" as const, helperText: "Solo el contador y el administrador pueden definirla." }]
         : []),
     ],
     validationSchema: z.object({
