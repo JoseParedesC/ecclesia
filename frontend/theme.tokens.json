@@ -2,7 +2,7 @@
   "_doc": "ÚNICA fuente de colores, tipografía, radios, sombras y movimiento. tailwind.config.js la convierte en variables CSS (--c-*) y en utilidades de Tailwind. Para cambiar la marca basta con editar este archivo.",
   "colors": {
     "light": {
-      "bg": "#F4F5F9",
+      "bg": "#fdfae4",
       "surface": "#FFFFFF",
       "mist": "#ECEEF4",
       "line": "#DCE0EA",
