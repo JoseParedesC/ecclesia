@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "./auth";
 import { AppShell } from "./components/layout/AppShell";
 import { ConfirmProvider, Spinner, ToastProvider } from "./components/ui";
 import Login from "./pages/Login";
+import Manual from "./pages/Manual";
 import Masters from "./pages/Masters";
 import MovementEdit from "./pages/MovementEdit";
 import Movements from "./pages/Movements";
@@ -27,6 +28,7 @@ function Gate() {
         <Route path="/expenses/new" element={<MovementEdit kind="expenses" />} />
         <Route path="/expenses/:id/edit" element={<MovementEdit kind="expenses" />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/manual" element={<Manual />} />
         <Route path="/masters" element={<Masters />} />
         {me.creatableRoles.length > 0 ? (
           <>

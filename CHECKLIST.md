@@ -37,10 +37,13 @@
 - [x] Tailwind configurado con los tokens que exige el paquete de maestros
 - [x] Archivo central de estilos (`theme.tokens.json`) y tema claro/oscuro/sistema; paleta clara dorada/crema (primario `#D4AF37`, variantes `primary_` en `#B88A24`; el tema oscuro hereda sus equivalentes)
 - [x] Estilo profesional unificado: tarjetas y tablas con bordes redondeados y encabezados en versalitas, botones primarios con degradado dorado, insignias con punto, alertas con acento lateral, menú lateral con indicador de sección activa, fondo con halos suaves, barras de desplazamiento finas; texto de acento sobre fondo claro usa `primary_` para mejor contraste
+- [x] Opción «How to use» al pie del menú lateral que lleva al manual de usuario (`/manual`, `pages/Manual.tsx`); el mismo contenido está en `docs/MANUAL_USUARIO.md`
 - [x] Regla del proyecto: todo CRUD tiene listado y formulario en pantallas aparte (maestros, ingresos, egresos, usuarios)
 - [x] Jerarquía ui → layout → features → pages, con transiciones suaves, toasts y diálogos de confirmación
 
 ## ⏳ Pendiente
+
+- [ ] Mantener sincronizados `pages/Manual.tsx` y `docs/MANUAL_USUARIO.md` cuando cambien las reglas (hoy son dos copias); valorar cargar el .md en la app con un renderizador
 
 - [ ] Compilar y probar Usuarios (listado/formulario) y el nuevo estilo en el navegador, en claro y oscuro (aquí solo se revisó la sintaxis)
 

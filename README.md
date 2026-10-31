@@ -48,6 +48,10 @@ Igual que los maestros, cada módulo tiene dos pantallas:
 
 Los registros creados antes de esta versión no tienen responsable; al editarlos se pedirá.
 
+## Manual de usuario
+
+La opción **How to use** (pie del menú) abre `/manual`. El mismo contenido está en `docs/MANUAL_USUARIO.md`.
+
 ## Usuarios
 
 Mismo patrón de dos pantallas: listado `/users` (búsqueda, filtros por rol y estado, activar/desactivar) y formulario en `/users/new` y `/users/:id/edit`.

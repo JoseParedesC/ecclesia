@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, LogOut, Menu, Printer, Settings2, Users, X, type LucideIcon } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, CircleHelp, LogOut, Menu, Printer, Settings2, Users, X, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth";
@@ -60,13 +60,16 @@ export function AppShell() {
           <button aria-label="Cerrar menú" onClick={() => setOpen(false)} className="rounded p-1 text-muted hover:bg-mist lg:hidden"><X className="h-5 w-5" /></button>
         </div>
         <nav aria-label="Principal" className="flex flex-col gap-1">{nav.filter((n) => !n.needsUsers || (me?.creatableRoles.length ?? 0) > 0).map(({ needsUsers: _u, ...n }) => <NavItem key={n.to} {...n} />)}</nav>
-        <div className="mt-auto flex flex-col gap-3 rounded-xl border border-line bg-mist/70 p-3">
+        <div className="mt-auto flex flex-col gap-3">
+        <NavItem to="/manual" label="How to use" Icon={CircleHelp} />
+        <div className="flex flex-col gap-3 rounded-xl border border-line bg-mist/70 p-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{me?.name ?? me?.email}</p>
             <p className="truncate text-xs text-muted">{me?.email}</p>
             <div className="mt-1.5"><Badge tone="primary"><span className="capitalize">{me?.role}</span></Badge></div>
           </div>
           <Button size="sm" variant="secondary" onClick={logout}><LogOut className="h-3.5 w-3.5" aria-hidden="true" />Cerrar sesión</Button>
+        </div>
         </div>
       </aside>
 
