@@ -16,7 +16,7 @@ const bodySchema = z
     date: isoDate.optional(), // en ingresos se ignora: la fecha de registro es la fecha actual y no se edita
     amount: z.number().positive().multipleOf(0.01),
     description: z.string().trim().max(1000).nullish(),
-    intentionDate: isoDate.nullish(),
+    eventDate: isoDate.nullish(),
     ...responsibleShape,
   })
   .superRefine(refineIdNumber);
@@ -24,40 +24,50 @@ const bodySchema = z
 export function movementsRouter(kind: Kind) {
   const k = KINDS[kind];
   const r = Router();
-  const intentionSel = kind === "income" ? "m.intention_date" : "NULL::date";
+  const intentionSel = "m.event_date";
 
   const select = `SELECT m.id, m.${k.fk} AS "typeId", t.name AS "typeName", c.code AS "categoryCode",
-      c.name AS "categoryName", t.account_code AS "accountCode", m.date, m.amount, m.description,
-      ${intentionSel} AS "intentionDate", m.period_id AS "periodId", p.status AS "periodStatus",
+      c.name AS "categoryName", c.has_default_amount AS "hasDefaultAmount", c.default_amount_editable AS "defaultAmountEditable", c.uses_date AS "usesDate", c.date_required AS "dateRequired", t.default_amount AS "defaultAmount", (c.has_default_amount AND NOT c.default_amount_editable) AS "fixedAmount", t.account_code AS "accountCode", m.date, m.amount, m.description,
+      ${intentionSel} AS "eventDate", m.period_id AS "periodId", p.status AS "periodStatus",
       m.responsible_name AS "responsible", m.address, m.id_type AS "idType", m.id_number AS "idNumber",
       m.contact_phone AS "phone", m.email, m.created_at AS "createdAt", COALESCE(u.name, u.email) AS "registeredBy"
     FROM ${k.mov} m JOIN ${k.type} t ON t.id = m.${k.fk} JOIN ${k.cat} c ON c.id = t.category_id
     JOIN periods p ON p.id = m.period_id LEFT JOIN users u ON u.id = m.created_by`;
 
   /** Valida tipo/categoría y la regla de estipendio. Devuelve valores normalizados. */
-  async function normalize(c: PoolClient, b: z.infer<typeof bodySchema>, mustBeActive: boolean) {
+  async function normalize(c: PoolClient, b: z.infer<typeof bodySchema>, mustBeActive: boolean, existingAmount?: number) {
     const { rows } = await c.query(
-      `SELECT t.active, cat.code FROM ${k.type} t JOIN ${k.cat} cat ON cat.id = t.category_id WHERE t.id = $1`,
+      `SELECT t.active, t.default_amount, cat.code, cat.has_default_amount, cat.default_amount_editable, cat.uses_date, cat.date_required FROM ${k.type} t JOIN ${k.cat} cat ON cat.id = t.category_id WHERE t.id = $1`,
       [b.typeId],
     );
     if (!rows[0]) throw new HttpError(422, "El tipo seleccionado no existe.");
     if (mustBeActive && !rows[0].active) throw new HttpError(422, "El tipo seleccionado está inactivo.");
-    const isStipend = k.stipendCode !== null && rows[0].code === k.stipendCode;
+    const cfg = rows[0];
     const description = b.description?.trim() || null;
-    if (isStipend && (!b.intentionDate || !description))
-      throw new HttpError(422, "Un estipendio requiere la fecha en que se realizará la intención y la descripción (mención/petición).");
-    return { description, intentionDate: isStipend ? b.intentionDate! : null };
+    if (k.stipendCode !== null && cfg.code === k.stipendCode && !description)
+      throw new HttpError(422, "Un estipendio requiere la descripción (mención/petición).");
+    // Fecha según la configuración de la categoría
+    if (cfg.uses_date && cfg.date_required && !b.eventDate)
+      throw new HttpError(422, "Esta categoría exige la fecha asociada al movimiento.");
+    // Valor sugerido no modificable: el monto debe ser el sugerido del tipo
+    if (cfg.has_default_amount && !cfg.default_amount_editable && existingAmount !== b.amount) {
+      if (cfg.default_amount == null)
+        throw new HttpError(422, "Configura el valor fijo de este tipo en Maestros antes de registrar movimientos.");
+      if (Number(cfg.default_amount) !== b.amount)
+        throw new HttpError(422, `El valor de este tipo no se puede cambiar (${cfg.default_amount}).`);
+    }
+    return { description, eventDate: cfg.uses_date ? b.eventDate ?? null : null };
   }
 
   async function existing(c: PoolClient, id: number) {
     const { rows } = await c.query(
-      `SELECT m.id, m.${k.fk} AS "typeId", m.date, p.status, p.year, p.month FROM ${k.mov} m JOIN periods p ON p.id = m.period_id WHERE m.id = $1 FOR UPDATE OF m`,
+      `SELECT m.id, m.${k.fk} AS "typeId", m.date, m.amount, p.status, p.year, p.month FROM ${k.mov} m JOIN periods p ON p.id = m.period_id WHERE m.id = $1 FOR UPDATE OF m`,
       [id],
     );
     if (!rows[0]) throw new HttpError(404, "Movimiento no encontrado.");
     if (rows[0].status !== "OPEN")
       throw new HttpError(409, `El período ${rows[0].year}-${String(rows[0].month).padStart(2, "0")} está cerrado.`);
-    return rows[0] as { id: number; typeId: number; date: string };
+    return rows[0] as { id: number; typeId: number; date: string; amount: number | string };
   }
 
   /**
@@ -85,7 +95,7 @@ export function movementsRouter(kind: Kind) {
       contact_phone: b.phone,
       email: b.email ?? null,
     };
-    if (kind === "income") data.intention_date = n.intentionDate;
+    data.event_date = n.eventDate;
     return data;
   }
 
@@ -137,7 +147,7 @@ export function movementsRouter(kind: Kind) {
       const cur = await existing(c, id);
       const date = movementDate(b, cur.date);
       const periodId = await requireOpenPeriodForDate(c, date);
-      const n = await normalize(c, b, b.typeId !== cur.typeId);
+      const n = await normalize(c, b, b.typeId !== cur.typeId, b.typeId === cur.typeId ? Number(cur.amount) : undefined);
       const data = columns(b, periodId, date, n);
       const cols = Object.keys(data);
       await c.query(

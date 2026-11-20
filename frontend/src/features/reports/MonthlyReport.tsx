@@ -9,11 +9,6 @@ import { FilterBar } from "./ReportActions";
 import { ReportSheet } from "./ReportSheet";
 import { ReportTable } from "./ReportTable";
 
-const section = (rows: Consolidado["incomes"], a: string, b: string): ReportTotals => {
-  const mk = (code: string, name: string) => { const r = rows.filter((x) => x.category === code); return { code, name, count: r.length, total: Math.round(r.reduce((s, x) => s + x.amount, 0) * 100) / 100 }; };
-  return { count: rows.length, total: Math.round(rows.reduce((s, x) => s + x.amount, 0) * 100) / 100, byCategory: [mk(a, a === "ESTIPENDIO" ? "Estipendios" : "Servicios"), mk(b, b === "DONACION" ? "Donaciones" : "Gastos")] };
-};
-
 function Totals({ t, label }: { t: ReportTotals; label: string }) {
   return (
     <dl className="ml-auto mt-3 grid w-full max-w-xs grid-cols-[1fr_auto] gap-x-6 gap-y-1.5 text-sm print:break-inside-avoid">
@@ -59,11 +54,11 @@ export function MonthlyReport() {
       {data && p && (
         <ReportSheet title={title} subtitle={p.status === "OPEN" ? "Período abierto: las cifras pueden cambiar" : "Período cerrado"}>
           <h3 className="mb-2 text-lg">Ingresos</h3>
-          <ReportTable rows={data.incomes} columns={["date", "type", "category", "account", "intentionDate", "description"]} />
-          {data.incomes.length > 0 && <Totals t={section(data.incomes, "ESTIPENDIO", "DONACION")} label="Total ingresos" />}
+          <ReportTable rows={data.incomes} showEventDate={data.incomeCategories.some((c) => c.usesDate)} columns={["date", "type", "category", "account", "eventDate", "description"]} />
+          {data.incomes.length > 0 && <Totals t={{ count: data.incomes.length, total: data.totals.ingresos, byCategory: data.totals.incomeByCategory }} label="Total ingresos" />}
           <h3 className="mb-2 mt-8 text-lg">Egresos</h3>
-          <ReportTable rows={data.expenses} columns={["date", "type", "category", "account", "description"]} />
-          {data.expenses.length > 0 && <Totals t={section(data.expenses, "SERVICIO", "GASTO")} label="Total egresos" />}
+          <ReportTable rows={data.expenses} showEventDate={data.expenseCategories.some((c) => c.usesDate)} columns={["date", "type", "category", "account", "eventDate", "description"]} />
+          {data.expenses.length > 0 && <Totals t={{ count: data.expenses.length, total: data.totals.egresos, byCategory: data.totals.expenseByCategory }} label="Total egresos" />}
           <div className="mt-8 flex items-baseline justify-between rounded-lg border border-line bg-mist/60 px-5 py-4 print:break-inside-avoid">
             <span className="font-serif text-lg">Saldo del período</span>
             <span className="font-serif text-2xl font-semibold tabular-nums text-primary_">{money(data.totals.saldo)}</span>

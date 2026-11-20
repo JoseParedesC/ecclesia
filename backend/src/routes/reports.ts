@@ -36,10 +36,12 @@ const movementsQ = z
 reportsRouter.get("/movements", async (req, res) => {
   const q = movementsQ.parse(req.query);
   const k = KINDS[q.kind];
-  const intention = q.kind === "income" ? "m.intention_date" : "NULL::date";
+  const intention = "m.event_date";
   const { rows } = await pool.query(
     `SELECT m.id, m.date, t.name AS type, c.code AS category, c.name AS "categoryName",
-            t.account_code AS account, m.description, ${intention} AS "intentionDate", m.amount,
+            t.account_code AS account, m.description, ${intention} AS "eventDate", m.amount,
+            (c.has_default_amount AND NOT c.default_amount_editable) AS "fixedAmount",
+            c.uses_date AS "usesDate",
             m.responsible_name AS responsible, m.id_type AS "idType", m.id_number AS "idNumber"
        FROM ${k.mov} m JOIN ${k.type} t ON t.id = m.${k.fk} JOIN ${k.cat} c ON c.id = t.category_id
       WHERE ($1::date IS NULL OR m.date >= $1) AND ($2::date IS NULL OR m.date <= $2)
@@ -58,16 +60,17 @@ const intentionsQ = z
 
 reportsRouter.get("/stipends", async (req, res) => {
   const q = intentionsQ.parse(req.query);
-  const field = q.by === "intention" ? "m.intention_date" : "m.date"; // lista blanca, no viene del cliente
+  const field = q.by === "intention" ? "m.event_date" : "m.date"; // lista blanca, no viene del cliente
   const { rows } = await pool.query(
-    `SELECT m.id, m.date, m.intention_date AS "intentionDate", t.name AS type, t.name AS "typeName", c.code AS category,
+    `SELECT m.id, m.date, m.event_date AS "eventDate", t.name AS type, t.name AS "typeName", c.code AS category,
             c.name AS "categoryName", m.description, m.amount,
+            (c.has_default_amount AND NOT c.default_amount_editable) AS "fixedAmount", TRUE AS "usesDate",
             m.responsible_name AS responsible, m.address, m.id_type AS "idType", m.id_number AS "idNumber",
             m.contact_phone AS phone, m.email, m.created_at AS "createdAt", COALESCE(u.name, u.email) AS "registeredBy"
        FROM incomes m JOIN income_types t ON t.id = m.income_type_id JOIN income_categories c ON c.id = t.category_id
        LEFT JOIN users u ON u.id = m.created_by
       WHERE c.code = 'ESTIPENDIO' AND ($1::date IS NULL OR ${field} >= $1) AND ($2::date IS NULL OR ${field} <= $2)
-      ORDER BY m.intention_date, m.id`,
+      ORDER BY m.event_date, m.id`,
     [q.from ?? null, q.to ?? null],
   );
   res.json({ rows, totals: summarize(rows) });

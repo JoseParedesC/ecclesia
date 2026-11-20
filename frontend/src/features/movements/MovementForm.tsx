@@ -4,7 +4,7 @@ import { pad, today } from "../../format";
 import { ID_TYPES, type IdType, type Movement, type TypeRow } from "../../types";
 
 export interface MovementInput {
-  typeId: number; date?: string; amount: number; description: string | null; intentionDate?: string | null;
+  typeId: number; date?: string; amount: number; description: string | null; eventDate?: string | null;
   responsible: string; address: string; idType: IdType; idNumber: string; phone: string; email: string | null;
 }
 /** Rango de fechas permitido: de la primera a la última fecha de los períodos abiertos. */
@@ -14,7 +14,7 @@ interface Props {
   onSubmit: (body: MovementInput) => Promise<void>; onCancel: () => void;
 }
 
-type Errors = Partial<Record<"typeId" | "date" | "amount" | "intentionDate" | "description" | "responsible" | "address" | "idType" | "idNumber" | "phone" | "email", string>>;
+type Errors = Partial<Record<"typeId" | "date" | "amount" | "eventDate" | "description" | "responsible" | "address" | "idType" | "idNumber" | "phone" | "email", string>>;
 
 export function defaultDate({ min, max }: DateRange) {
   const t = new Date();
@@ -39,7 +39,7 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
   // Último valor sugerido que se cargó solo; sirve para saber si la persona ya escribió su propio monto
   const [suggested, setSuggested] = useState("");
   const [description, setDescription] = useState(editing?.description ?? "");
-  const [intentionDate, setIntentionDate] = useState(editing?.intentionDate ?? "");
+  const [eventDate, setEventDate] = useState(editing?.eventDate ?? "");
   const [responsible, setResponsible] = useState(editing?.responsible ?? "");
   const [address, setAddress] = useState(editing?.address ?? "");
   const [idType, setIdType] = useState<IdType | "">(editing?.idType ?? "");
@@ -52,6 +52,10 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
 
   const selected = types.find((t) => String(t.id) === typeId);
   const isStipend = isIncome && selected?.categoryCode === "ESTIPENDIO";
+  const hasDefaultAmount = !!selected?.hasDefaultAmount;
+  const usesDate = !!selected?.usesDate;
+  const dateRequired = !!selected?.dateRequired;
+  const fixedAmount = hasDefaultAmount && !selected?.defaultAmountEditable;
   const options = types.filter((t) => t.active || String(t.id) === typeId);
 
   /** Al elegir un tipo con valor sugerido (estipendios) y crear un ingreso nuevo, propone ese monto si la persona aún no escribió otro. */
@@ -60,7 +64,11 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
     if (editing) return;
     const def = types.find((t) => String(t.id) === id)?.defaultAmount;
     const next = def != null ? String(def) : "";
-    if (amount === "" || amount === suggested) {
+    const nextType = types.find((t) => String(t.id) === id);
+    if (nextType?.hasDefaultAmount && !nextType.defaultAmountEditable && nextType.defaultAmount != null) {
+      setAmount(next);
+      setSuggested(next);
+    } else if (amount === "" || amount === suggested) {
       setAmount(next);
       setSuggested(next);
     }
@@ -73,8 +81,9 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
       if (!date) e.date = "La fecha es obligatoria";
       else if (date < range.min || date > range.max) e.date = "La fecha debe estar dentro de un período abierto";
     }
-    if (!(Number(amount) > 0)) e.amount = "El monto debe ser mayor que cero";
-    if (isStipend && !intentionDate) e.intentionDate = "Indica la fecha en que se realizará";
+    if (fixedAmount && selected?.defaultAmount == null && !(editing && editing.typeId === Number(typeId) && Number(amount) === editing.amount)) e.amount = "Configura primero el valor fijo de este tipo en Maestros.";
+    else if (!(Number(amount) > 0)) e.amount = "El monto debe ser mayor que cero";
+    if (usesDate && dateRequired && !eventDate) e.eventDate = "Indica la fecha asociada al movimiento";
     if (isStipend && !description.trim()) e.description = "La mención o petición es obligatoria";
     if (!responsible.trim()) e.responsible = "El responsable es obligatorio";
     if (!address.trim()) e.address = "La dirección es obligatoria";
@@ -96,7 +105,7 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
     try {
       await onSubmit({
         typeId: Number(typeId), ...(isIncome ? {} : { date }), amount: Number(amount), description: description.trim() || null,
-        ...(isStipend ? { intentionDate: intentionDate || null } : {}),
+        ...(usesDate ? { eventDate: eventDate || null } : {}),
         responsible: responsible.trim(), address: address.trim(), idType: idType as IdType, idNumber: idNumber.trim(),
         phone: phone.trim(), email: email.trim() || null,
       });
@@ -124,10 +133,11 @@ export function MovementForm({ types, range, isIncome, editing, onSubmit, onCanc
             )}
             <MoneyInput
               label="Monto" required value={amount} error={errors.amount} onValueChange={setAmount}
-              hint={amount !== "" && amount === suggested ? "Valor sugerido para este tipo; puedes modificarlo." : undefined}
+              disabled={!!fixedAmount}
+              hint={fixedAmount ? (selected?.defaultAmount == null ? "Configura el valor fijo de este tipo en Maestros." : "Valor fijo definido para este tipo.") : amount !== "" && amount === suggested ? "Valor sugerido para este tipo; puedes modificarlo." : undefined}
             />
-            {isStipend && (
-              <Input label="Fecha en que se realizará la intención" type="date" required hint="Puedes elegirla o cambiarla." value={intentionDate} error={errors.intentionDate} onChange={(e) => setIntentionDate(e.target.value)} className="animate-slide-down" />
+            {usesDate && (
+              <Input label={isStipend ? "Fecha en que se realizará la intención" : "Fecha asociada"} type="date" required={dateRequired} hint={dateRequired ? "Obligatoria según la configuración de la categoría." : "Opcional según la configuración de la categoría."} value={eventDate} error={errors.eventDate} onChange={(e) => setEventDate(e.target.value)} className="animate-slide-down" />
             )}
             <Textarea
               label={isStipend ? "Mención o petición" : "Descripción"} rows={2} required={isStipend}

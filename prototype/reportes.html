@@ -1,0 +1,90 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ecclesia · Prototipo de reportes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBF8F1;--surface:#fff;--ink:#2A2418;--muted:#7A705C;--line:#E7DFCB;--gold:#B88A24;--mist:#F4EEDD;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#17140E;--surface:#211D14;--ink:#F1EAD8;--muted:#A89E86;--line:#3A3426;--gold:#D4AF37;--mist:#2A2519;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#17140E;--surface:#211D14;--ink:#F1EAD8;--muted:#A89E86;--line:#3A3426;--gold:#D4AF37;--mist:#2A2519;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;min-height:100%}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,serif;margin:0;font-weight:600}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 48px;display:grid;gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;background:var(--mist);padding:4px;border-radius:12px;overflow-x:auto}
+.tab{border:0;background:none;color:var(--muted);padding:8px 14px;border-radius:9px;cursor:pointer;font:inherit;font-weight:500;white-space:nowrap;transition:background .25s,color .25s}
+.tab[aria-selected=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px #0002}
+.cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.cat{border:1px solid var(--line);border-radius:12px;padding:12px;transition:border-color .3s}
+.cat h3{font-size:15px;margin-bottom:6px}
+.opt{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;transition:opacity .3s}
+.opt.sub{margin-left:14px;padding-left:10px;border-left:2px solid var(--line)}
+.opt.off{opacity:.35;pointer-events:none}
+.sw{appearance:none;width:38px;height:22px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;transition:background .3s;flex:none;margin:0}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .3s}
+.sw:checked{background:var(--gold)}.sw:checked::after{transform:translateX(16px)}
+.sw:focus-visible,.tab:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.sheet{animation:in .45s cubic-bezier(.2,.7,.2,1) both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#D4AF37,#B88A24);color:#fff;display:grid;place-items:center;font:600 20px "Source Serif 4",serif}
+.muted{color:var(--muted);font-size:12px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-align:left;color:var(--muted);font-weight:600;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+tr{animation:in .4s both}.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tot{margin:14px 0 0 auto;max-width:300px;display:grid;grid-template-columns:1fr auto;gap:4px 20px}
+.tot .t{border-top:1px solid var(--line);padding-top:6px;font-weight:600}
+.saldo{display:flex;justify-content:space-between;align-items:baseline;background:var(--mist);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-top:20px}
+.saldo b{font:600 24px "Source Serif 4",serif;color:var(--gold)}
+.rc{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.rec{border:1px dashed var(--muted);border-radius:10px;padding:12px;font-size:13px;display:grid;gap:3px}
+.rec h3{font-size:15px}
+.pill{font-size:11px;background:var(--mist);border:1px solid var(--line);border-radius:99px;padding:1px 8px}
+button.t{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 12px;font:inherit;cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{.noprint{display:none}.card{border:0;padding:0}}
+</style></head><body><div class="wrap">
+<div class="top noprint"><div><h1>Prototipo de reportes</h1><p class="muted" style="margin:2px 0 0">Cambia la configuración de cada categoría y mira cómo se adapta el reporte.</p></div>
+<button class="t" id="theme">Cambiar tema</button></div>
+<section class="card noprint"><div class="cfg" id="cfg"></div></section>
+<div class="tabs noprint" role="tablist" id="tabs"></div>
+<article class="card sheet" id="sheet"></article></div>
+<script>
+const P={name:"Parroquia San José Obrero",addr:"Calle 30 #12-45 · Cartagena, Bolívar",contact:"605 664 1234 · secretaria@sanjose.org"};
+const C={ESTIPENDIO:{n:"Estipendio",k:"i",def:true,ed:true,date:true,req:true},DONACION:{n:"Donación",k:"i",def:false,ed:true,date:false,req:false},
+SERVICIO:{n:"Servicio",k:"e",def:false,ed:true,date:false,req:false},GASTO:{n:"Gasto",k:"e",def:true,ed:false,date:true,req:false}};
+const I=[["2026-11-03","Estipendio de misa","ESTIPENDIO","2026-11-08","Por el eterno descanso de Ana Gómez",20000,"María Pérez · CC 45.221.980"],
+["2026-11-05","Estipendio de misa","ESTIPENDIO","2026-11-15","Acción de gracias familia Ruiz",20000,"Luis Ruiz · CC 73.114.220"],
+["2026-11-09","Colecta dominical","DONACION",null,"Colecta misa 10:00",412500,"Anónimo · —"]];
+const E=[["2026-11-04","Servicios públicos","SERVICIO",null,"Energía octubre",386200,"Electricaribe · NIT 800.123.456-1"],
+["2026-11-10","Mantenimiento","GASTO","2026-11-12","Reparación techo sacristía",350000,"J. Torres · CC 9.280.114"]];
+const m=n=>"$ "+n.toLocaleString("es-CO"),d=s=>s?new Date(s+"T12:00").toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"}):"—";
+const $=s=>document.querySelector(s);let tab="income";
+$("#cfg").innerHTML=Object.entries(C).map(([k,c])=>`<div class="cat"><h3>${c.n} <span class="pill">${c.k=="i"?"Ingreso":"Egreso"}</span></h3>
+<label class="opt">Valor sugerido<input class="sw" type="checkbox" data-k="${k}" data-f="def" ${c.def?"checked":""}></label>
+<label class="opt sub" id="ed-${k}">Se puede cambiar<input class="sw" type="checkbox" data-k="${k}" data-f="ed" ${c.ed?"checked":""}></label>
+<label class="opt">Maneja fecha<input class="sw" type="checkbox" data-k="${k}" data-f="date" ${c.date?"checked":""}></label>
+<label class="opt sub" id="rq-${k}">Fecha obligatoria<input class="sw" type="checkbox" data-k="${k}" data-f="req" ${c.req?"checked":""}></label></div>`).join("");
+$("#cfg").onchange=e=>{const t=e.target;C[t.dataset.k][t.dataset.f]=t.checked;draw()};
+$("#tabs").innerHTML=[["income","Ingresos"],["expense","Egresos"],["stip","Estipendios"],["month","Consolidado"]].map(([v,l])=>`<button class="tab" role="tab" data-v="${v}">${l}</button>`).join("");
+$("#tabs").onclick=e=>{if(e.target.dataset.v){tab=e.target.dataset.v;draw(true)}};
+$("#theme").onclick=()=>{const r=document.documentElement,dk=getComputedStyle(r).colorScheme=="dark";r.dataset.theme=dk?"light":"dark"};
+const head=(t,s)=>`<div class="head"><div><div class="brand"><div class="logo">SJ</div><div><b style="font-family:'Source Serif 4',serif">${P.name}</b><div class="muted">${P.addr}<br>${P.contact}</div></div></div><h2 style="margin-top:14px;font-size:24px">${t}</h2><div class="muted">${s}</div></div><div class="muted" style="text-align:right">Generado el 20 de noviembre de 2026<br>por secretaría</div></div>`;
+function tbl(rows){const any=rows.some(r=>C[r[2]].date);
+return `<div class="tw"><table><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th>${any?"<th>Fecha asociada</th>":""}<th>Responsable</th><th>Descripción</th><th class="num">Monto</th></tr>${rows.map((r,i)=>{const c=C[r[2]];
+const fa=!c.date?"—":r[3]?d(r[3]):(c.req?"⚠ falta":"—");
+return`<tr style="animation-delay:${i*60}ms"><td>${d(r[0])}</td><td>${r[1]}${c.def&&!c.ed?' <span class="pill" title="Valor fijo">fijo</span>':""}</td><td>${c.n}</td>${any?`<td>${fa}</td>`:""}<td>${r[6]}</td><td>${r[4]}</td><td class="num">${m(r[5])}</td></tr>`}).join("")}</table></div>`}
+const tot=(rows,l)=>{const g={};rows.forEach(r=>{g[r[2]]=(g[r[2]]||[0,0]);g[r[2]][0]++;g[r[2]][1]+=r[5]});const s=rows.reduce((a,r)=>a+r[5],0);
+return`<div class="tot">${Object.entries(g).map(([k,v])=>`<span class="muted">${C[k].n} (${v[0]})</span><span class="num">${m(v[1])}</span>`).join("")}<span class="t">${l}</span><span class="t num">${m(s)}</span></div>`};
+function rec(r){const c=C[r[2]];return`<div class="rec"><h3>${P.name}</h3><span class="muted">${P.addr}</span><hr style="border:0;border-top:1px solid var(--line);width:100%"><b>${r[1]}</b><span>${r[4]}</span>${c.date?`<span>Se realiza: <b>${d(r[3])}</b></span>`:""}<span>${r[6]}</span><b class="num" style="text-align:left">${m(r[5])}${c.def&&!c.ed?" · valor fijo":c.def?" · valor sugerido":""}</b></div>`}
+function draw(anim){const s=$("#sheet");let h="";
+if(tab=="income")h=head("Reporte de ingresos","Del 1 al 20 de noviembre de 2026")+tbl(I)+tot(I,"Total ingresos");
+if(tab=="expense")h=head("Reporte de egresos","Del 1 al 20 de noviembre de 2026")+tbl(E)+tot(E,"Total egresos");
+if(tab=="stip"){const S=I.filter(r=>r[2]=="ESTIPENDIO");h=head("Reporte de estipendios","Por fecha de realización · comprobantes de media hoja")+`<div class="rc">${S.map(rec).join("")}</div>`+tot(S,"Total estipendios")}
+if(tab=="month"){const a=I.reduce((x,r)=>x+r[5],0),b=E.reduce((x,r)=>x+r[5],0);h=head("Consolidado de noviembre 2026","Período abierto: las cifras pueden cambiar")+"<h3>Ingresos</h3>"+tbl(I)+tot(I,"Total ingresos")+"<h3 style='margin-top:24px'>Egresos</h3>"+tbl(E)+tot(E,"Total egresos")+`<div class="saldo"><span style="font:600 18px 'Source Serif 4',serif">Saldo del período</span><b>${m(a-b)}</b></div>`}
+s.innerHTML=h;if(anim){s.style.animation="none";s.offsetWidth;s.style.animation=""}
+document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v==tab));
+Object.entries(C).forEach(([k,c])=>{$("#ed-"+k).classList.toggle("off",!c.def);$("#rq-"+k).classList.toggle("off",!c.date)})}
+draw();
+</script></body></html>

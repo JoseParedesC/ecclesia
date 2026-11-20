@@ -33,3 +33,12 @@
 
 ## 1.0.0
 - Versión base: períodos, ingresos y egresos con datos del responsable, maestros, usuarios por rol, reportes imprimibles, manual de usuario y datos de la parroquia.
+
+
+## v1.3 — cierre de categorías configurables
+
+- Formularios de ingresos/egresos respetan valor sugerido, valor fijo y fecha configurable.
+- Panel de valores sugeridos generalizado para ingresos y egresos.
+- Reportes y consolidado usan fecha asociada para ambos tipos de movimiento, marcan valores fijos y agrupan categorías dinámicamente.
+- Campo de fecha renombrado a `event_date` / `eventDate` con migración de datos existentes.
+- Al hacer obligatoria una fecha, se informa el número de movimientos históricos que no tienen fecha.

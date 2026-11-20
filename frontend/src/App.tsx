@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth";
 import { AppShell } from "./components/layout/AppShell";
 import { ConfirmProvider, Spinner, ToastProvider } from "./components/ui";
+import Categories from "./pages/Categories";
 import Login from "./pages/Login";
 import Manual from "./pages/Manual";
 import Masters from "./pages/Masters";
@@ -36,6 +37,7 @@ function Gate() {
         <Route path="/parish" element={<Parish />} />
         <Route path="/parish/edit" element={<ParishEdit />} />
         <Route path="/masters" element={<Masters />} />
+        <Route path="/categories" element={<Categories />} />
         {me.creatableRoles.length > 0 ? (
           <>
             <Route path="/users" element={<Users />} />

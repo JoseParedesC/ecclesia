@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS incomes (
   period_id      INT NOT NULL REFERENCES periods(id),
   date           DATE NOT NULL,
   amount         NUMERIC(14,2) NOT NULL CHECK (amount > 0),
-  intention_date DATE,                      -- fecha en que se realiza la intención; solo para categoría ESTIPENDIO
+  event_date DATE,                      -- fecha en que se realiza la intención; solo para categoría ESTIPENDIO
   description    TEXT,                      -- mención / petición del estipendio
   created_by     INT REFERENCES users(id),
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   period_id       INT NOT NULL REFERENCES periods(id),
   date            DATE NOT NULL,
   amount          NUMERIC(14,2) NOT NULL CHECK (amount > 0),
+  event_date      DATE,                      -- fecha asociada si la categoría maneja fecha
   description     TEXT,
   created_by      INT REFERENCES users(id),
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -148,3 +149,43 @@ INSERT INTO expense_types (code, name, category_id)
   SELECT 'SRV-PUBLICOS', 'Servicios públicos', id FROM expense_categories WHERE code='SERVICIO' ON CONFLICT DO NOTHING;
 INSERT INTO expense_types (code, name, category_id)
   SELECT 'GST-MANTTO', 'Mantenimiento', id FROM expense_categories WHERE code='GASTO' ON CONFLICT DO NOTHING;
+
+-- v1.3: categorías configurables (valor sugerido / editable / fecha / fecha obligatoria)
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='income_categories' AND column_name='has_default_amount') THEN
+    ALTER TABLE income_categories ADD COLUMN has_default_amount BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE income_categories ADD COLUMN default_amount_editable BOOLEAN NOT NULL DEFAULT TRUE;
+    ALTER TABLE income_categories ADD COLUMN uses_date BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE income_categories ADD COLUMN date_required BOOLEAN NOT NULL DEFAULT FALSE;
+    -- Estipendio conserva su comportamiento histórico
+    UPDATE income_categories SET has_default_amount=TRUE, uses_date=TRUE, date_required=TRUE WHERE code='ESTIPENDIO';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='expense_categories' AND column_name='has_default_amount') THEN
+    ALTER TABLE expense_categories ADD COLUMN has_default_amount BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE expense_categories ADD COLUMN default_amount_editable BOOLEAN NOT NULL DEFAULT TRUE;
+    ALTER TABLE expense_categories ADD COLUMN uses_date BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE expense_categories ADD COLUMN date_required BOOLEAN NOT NULL DEFAULT FALSE;
+  END IF;
+END $$;
+ALTER TABLE expense_types ADD COLUMN IF NOT EXISTS default_amount NUMERIC(14,2) CHECK (default_amount IS NULL OR default_amount > 0);
+-- v1.4: nombre genérico para la fecha asociada; migra datos existentes sin perderlos.
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='incomes' AND column_name='intention_date')
+     AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='incomes' AND column_name='event_date') THEN
+    ALTER TABLE incomes RENAME COLUMN intention_date TO event_date;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='expenses' AND column_name='intention_date')
+     AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='expenses' AND column_name='event_date') THEN
+    ALTER TABLE expenses RENAME COLUMN intention_date TO event_date;
+  END IF;
+END $$;
+ALTER TABLE incomes ADD COLUMN IF NOT EXISTS event_date DATE;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS event_date DATE;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='incomes' AND column_name='intention_date') THEN
+    UPDATE incomes SET event_date = COALESCE(event_date, intention_date);
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='expenses' AND column_name='intention_date') THEN
+    UPDATE expenses SET event_date = COALESCE(event_date, intention_date);
+  END IF;
+END $$;

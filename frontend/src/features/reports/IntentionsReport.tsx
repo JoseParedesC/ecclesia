@@ -22,7 +22,7 @@ export function IntentionsReport() {
     setLoading(true);
     setError("");
     try {
-      setResult(await api<ReportResult>(`/reports/intentions?${new URLSearchParams({ from, to, by })}`));
+      setResult(await api<ReportResult>(`/reports/stipends?${new URLSearchParams({ from, to, by })}`));
       setSubtitle(`${periodRangeText(from, to)} · por fecha de ${by === "intention" ? "realización" : "registro"}`);
     } catch (e) {
       setError((e as Error).message);
@@ -44,7 +44,7 @@ export function IntentionsReport() {
       </FilterBar>
       {result && (
         <ReportSheet title="Reporte de intenciones" subtitle={subtitle}>
-          <ReportTable rows={result.rows} columns={["intentionDate", "date", "type", "description"]} />
+          <ReportTable rows={result.rows} columns={["eventDate", "date", "type", "description"]} />
           {result.rows.length > 0 && <TotalsBlock totals={result.totals} label="Total intenciones" />}
         </ReportSheet>
       )}

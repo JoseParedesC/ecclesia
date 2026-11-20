@@ -36,13 +36,13 @@ export default function Masters() {
   const [kind, setKind] = useState<"income" | "expense">("income");
   return (
     <>
-      <PageHeader title="Maestros" description="Tipos de ingreso y de egreso con su categoría. La cuenta contable la definen el contador y el administrador; el valor sugerido de los estipendios se configura debajo de la tabla." />
+      <PageHeader title="Maestros" description="Tipos de ingreso y de egreso con su categoría. La cuenta contable la definen el contador y el administrador; los valores sugeridos por categoría se configuran debajo de la tabla." />
       <div className="mb-5">
         <Tabs value={kind} onChange={setKind} items={[{ value: "income", label: "Ingresos" }, { value: "expense", label: "Egresos" }]} />
       </div>
       <div className="animate-fade-in" key={kind}>
         <MasterTab kind={kind} />
-        {kind === "income" && <StipendDefaultsPanel />}
+        <StipendDefaultsPanel kind={kind} />
       </div>
     </>
   );

@@ -3,12 +3,12 @@ import { EmptyState, Table, Td, Th, Tr } from "../../components/ui";
 import { money } from "../../format";
 import type { ReportRow } from "../../types";
 
-export type Column = "date" | "intentionDate" | "type" | "category" | "account" | "responsible" | "identification" | "description";
+export type Column = "date" | "eventDate" | "type" | "category" | "account" | "responsible" | "identification" | "description";
 const labels: Record<Column, string> = {
-  date: "Fecha", intentionDate: "Se realiza", type: "Tipo", category: "Categoría", account: "Cuenta", responsible: "Responsable", identification: "Identificación", description: "Descripción",
+  date: "Fecha", eventDate: "Fecha asociada", type: "Tipo", category: "Categoría", account: "Cuenta", responsible: "Responsable", identification: "Identificación", description: "Descripción",
 };
 
-export function ReportTable({ rows, columns }: { rows: ReportRow[]; columns: Column[] }) {
+export function ReportTable({ rows, columns, showEventDate }: { rows: ReportRow[]; columns: Column[]; showEventDate?: boolean }) {
   if (!rows.length) return <EmptyState icon={SearchX} title="Sin resultados">No hay registros para los filtros elegidos.</EmptyState>;
   const cell = (r: ReportRow, c: Column) =>
     c === "category" ? r.categoryName
@@ -20,15 +20,15 @@ export function ReportTable({ rows, columns }: { rows: ReportRow[]; columns: Col
       <Table>
         <thead>
           <tr>
-            {columns.map((c) => <Th key={c}>{labels[c]}</Th>)}
+            {columns.filter((c) => c !== "eventDate" || (showEventDate ?? rows.some((r) => r.usesDate))).map((c) => <Th key={c}>{labels[c]}</Th>)}
             <Th className="text-right">Monto</Th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
             <Tr key={r.id}>
-              {columns.map((c) => <Td key={c} className={c === "description" ? "max-w-xs" : "whitespace-nowrap"}>{cell(r, c)}</Td>)}
-              <Td className="whitespace-nowrap text-right font-medium tabular-nums">{money(r.amount)}</Td>
+              {columns.filter((c) => c !== "eventDate" || (showEventDate ?? rows.some((x) => x.usesDate))).map((c) => <Td key={c} className={c === "description" ? "max-w-xs" : "whitespace-nowrap"}>{cell(r, c)}</Td>)}
+              <Td className="whitespace-nowrap text-right font-medium tabular-nums">{money(r.amount)} {r.fixedAmount && <span className="ml-1 text-xs text-muted">(fijo)</span>}</Td>
             </Tr>
           ))}
         </tbody>

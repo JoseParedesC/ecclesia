@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, CircleHelp, Landmark, ListTree, LogOut, Menu, Printer, Settings, Users, X } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, CalendarDays, CircleHelp, Landmark, ListTree, Tags, LogOut, Menu, Printer, Settings, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth";
@@ -24,6 +24,7 @@ export function AppShell() {
       label: "Configuración", Icon: Settings,
       children: [
         { to: "/masters", label: "Maestros", Icon: ListTree },
+        { to: "/categories", label: "Categorías", Icon: Tags },
         ...((me?.creatableRoles.length ?? 0) > 0 ? [{ to: "/users", label: "Usuarios", Icon: Users }] : []),
         { to: "/parish", label: "Parroquia", Icon: Landmark },
       ],

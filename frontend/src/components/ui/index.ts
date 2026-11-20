@@ -11,3 +11,5 @@ export * from "./Table";
 export * from "./Tabs";
 export * from "./confirm";
 export * from "./toast";
+export * from "./Switch";
+export * from "./Collapse";

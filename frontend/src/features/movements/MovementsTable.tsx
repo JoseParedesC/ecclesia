@@ -13,7 +13,7 @@ export function MovementsTable({ rows, isIncome, onEdit, onDelete, onPrint }: Pr
       <Table>
         <thead>
           <tr>
-            <Th>Fecha</Th><Th>Tipo</Th>{isIncome && <Th>Se realiza</Th>}<Th>Responsable</Th><Th>Contacto</Th><Th>Descripción</Th><Th className="text-right">Monto</Th><Th><span className="sr-only">Acciones</span></Th>
+            <Th>Fecha</Th><Th>Tipo</Th>{rows.some((m) => m.usesDate) && <Th>Fecha asociada</Th>}<Th>Responsable</Th><Th>Contacto</Th><Th>Descripción</Th><Th className="text-right">Monto</Th><Th><span className="sr-only">Acciones</span></Th>
           </tr>
         </thead>
         <tbody>
@@ -24,7 +24,7 @@ export function MovementsTable({ rows, isIncome, onEdit, onDelete, onPrint }: Pr
                 <p className="font-medium">{m.typeName}</p>
                 <Badge tone={m.categoryCode === "ESTIPENDIO" ? "primary" : "neutral"}>{m.categoryName}</Badge>
               </Td>
-              {isIncome && <Td className="whitespace-nowrap tabular-nums">{m.intentionDate ?? "—"}</Td>}
+              {rows.some((x) => x.usesDate) && <Td className="whitespace-nowrap tabular-nums">{m.usesDate ? m.eventDate ?? "—" : "—"}</Td>}
               <Td>
                 <p className="font-medium">{m.responsible ?? "—"}</p>
                 {m.idType && <p className="whitespace-nowrap text-xs text-muted">{m.idType} {m.idNumber}</p>}
@@ -35,7 +35,7 @@ export function MovementsTable({ rows, isIncome, onEdit, onDelete, onPrint }: Pr
                 {m.address && <p className="max-w-[12rem] text-xs">{m.address}</p>}
               </Td>
               <Td className="max-w-xs text-muted">{m.description ?? "—"}</Td>
-              <Td className="whitespace-nowrap text-right font-medium tabular-nums">{money(m.amount)}</Td>
+              <Td className="whitespace-nowrap text-right font-medium tabular-nums">{money(m.amount)} {m.fixedAmount && <span className="ml-1 text-xs text-muted">(fijo)</span>}</Td>
               <Td>
                 <div className="flex justify-end gap-1">
                   {onPrint && m.categoryCode === "ESTIPENDIO" && (

@@ -68,7 +68,7 @@ export function MovementsReport({ kind }: { kind: "income" | "expense" }) {
       </FilterBar>
       {result && (
         <ReportSheet title={title} subtitle={subtitle}>
-          <ReportTable rows={result.rows} columns={isIncome ? ["date", "type", "category", "account", "intentionDate", "responsible", "identification", "description"] : ["date", "type", "category", "account", "responsible", "identification", "description"]} />
+          <ReportTable rows={result.rows} showEventDate={cats.some((c) => c.usesDate && (!categoryId || String(c.id) === categoryId))} columns={["date", "type", "category", "account", "eventDate", "responsible", "identification", "description"]} />
           {result.rows.length > 0 && <TotalsBlock totals={result.totals} />}
         </ReportSheet>
       )}

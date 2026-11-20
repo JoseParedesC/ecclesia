@@ -42,7 +42,7 @@ export function StipendReceipt({ r, parish }: { r: StipendReceiptData; parish: P
       <dl className="mt-3 grid grid-cols-3 gap-x-4 gap-y-2">
         <Field label="Estipendio">{r.typeName}</Field>
         <Field label="Fecha de registro" className="tabular-nums">{r.date}</Field>
-        <Field label="Se realizará el" className="tabular-nums">{r.intentionDate}</Field>
+        <Field label="Se realizará el" className="tabular-nums">{r.eventDate}</Field>
         <Field label="Mención o petición" className="col-span-3"><span className="line-clamp-3">{r.description}</span></Field>
       </dl>
 
