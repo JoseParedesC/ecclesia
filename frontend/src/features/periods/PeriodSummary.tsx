@@ -3,9 +3,8 @@ import { money, periodLabel } from "../../format";
 import type { Period, Totals } from "../../types";
 
 export function PeriodSummary({ period, totals }: { period: Period; totals: Totals }) {
-  const rows: [string, number][] = [
-    ["Estipendios", totals.estipendio], ["Donaciones", totals.donacion], ["Servicios", totals.servicio], ["Gastos", totals.gasto],
-  ];
+  // Dinámico: incluye las categorías que se creen en Configuración → Categorías
+  const rows: [string, number][] = [...totals.incomeByCategory, ...totals.expenseByCategory].map((c) => [c.name, c.total]);
   return (
     <div className="animate-slide-up space-y-4">
       <h2 className="text-xl capitalize">Resumen de {periodLabel(period)}</h2>

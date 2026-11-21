@@ -41,6 +41,14 @@
    - Al activar fecha obligatoria, el API cuenta movimientos de esa categoría sin `event_date`.
    - La interfaz informa cuántos movimientos existentes quedan sin fecha asociada. No se modifican ni eliminan esos movimientos históricos.
 
+## Agregado en esta iteración — más categorías (v1.4)
+
+- **API**: `POST /categories/:kind` (nombre + 4 opciones; el código se genera del nombre y no cambia), `PATCH` ahora también renombra, `DELETE` solo si la categoría no tiene tipos. `GET` devuelve `typeCount` y `protected`.
+- **Protegida**: `ESTIPENDIO` no se renombra ni se elimina (el sistema la usa por código en comprobantes y descripción obligatoria).
+- **Pantalla Categorías**: botón «Nueva categoría» con panel animado y vista previa en vivo, renombrar, eliminar con confirmación, contador de tipos.
+- **Resumen de períodos**: ahora lista todas las categorías (antes solo las 4 fijas).
+- Pendiente: reordenar categorías; mover tipos de una categoría a otra desde la pantalla de categorías; `totals.estipendio/donacion/servicio/gasto` del API son solo por compatibilidad y pueden retirarse.
+
 ## Validación pendiente
 
 8. **Pruebas de integración y UI**

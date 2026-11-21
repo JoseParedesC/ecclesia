@@ -10,6 +10,8 @@ export interface Category {
   id: number; code: string; name: string;
   /** Configuración de la categoría (Configuración → Categorías) */
   hasDefaultAmount: boolean; defaultAmountEditable: boolean; usesDate: boolean; dateRequired: boolean;
+  /** Tipos asociados y si el sistema la usa por su código (no se renombra ni se elimina). */
+  typeCount?: number; protected?: boolean;
 }
 export type CategoryConfig = Pick<Category, "hasDefaultAmount" | "defaultAmountEditable" | "usesDate" | "dateRequired">;
 export interface TypeRow extends MasterEntity {
