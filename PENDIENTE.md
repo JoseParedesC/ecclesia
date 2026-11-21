@@ -49,6 +49,14 @@
 - **Resumen de períodos**: ahora lista todas las categorías (antes solo las 4 fijas).
 - Pendiente: reordenar categorías; mover tipos de una categoría a otra desde la pantalla de categorías; `totals.estipendio/donacion/servicio/gasto` del API son solo por compatibilidad y pueden retirarse.
 
+## Corrección de UX en Categorías (v1.4.1)
+
+- **Cambio Ingresos/Egresos**: se desmonta todo y se monta de nuevo con los datos del nuevo tipo. La lista guarda su tipo (`view.kind`), las respuestas tardías se ignoran y las claves incluyen el tipo (los ids de ambas tablas coinciden). Antes se veía un instante la lista anterior y una creación en curso podía agregarse a la lista equivocada.
+- **Alerta «Se perderán los datos»**: aparece si el formulario de nueva categoría está abierto o hay cambios sin guardar en alguna tarjeta. Si no se confirma, el usuario sigue donde estaba. Las pestañas se bloquean mientras se guarda.
+- **Accionabilidad**: `Collapse` cerrado queda `inert` (sus controles ya no reciben foco ni clics ocultos); se evitan envíos dobles mientras hay una operación en curso.
+- **Banner «Así se verá en el formulario»**: más grande (título, campos de 3rem, etiquetas con ícono y texto explicativo por campo), con acento lateral y fijo (sticky) al desplazarse.
+- Pendiente: probar en navegador (teclado, móvil, claro/oscuro) y avisar también al recargar la página con datos sin guardar (`beforeunload`).
+
 ## Validación pendiente
 
 8. **Pruebas de integración y UI**

@@ -1,5 +1,5 @@
 import { ChevronDown, Lock, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge, Button, Card, Collapse, Input } from "../../components/ui";
 import { cn } from "../../lib/cn";
 import type { Category, CategoryConfig } from "../../types";
@@ -10,8 +10,8 @@ import { sameConfig, toConfig } from "./rules";
 export type CategorySave = CategoryConfig & { name?: string };
 
 /** Tarjeta desplegable: nombre, las 4 opciones, vista previa y eliminación. */
-export function CategoryCard({ category, saving, onSave, onDelete }: {
-  category: Category; saving: boolean; onSave: (c: CategorySave) => void; onDelete: () => void;
+export function CategoryCard({ category, saving, onSave, onDelete, onDirtyChange }: {
+  category: Category; saving: boolean; onSave: (c: CategorySave) => void; onDelete: () => void; onDirtyChange: (dirty: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
   const saved = toConfig(category);
@@ -19,6 +19,8 @@ export function CategoryCard({ category, saving, onSave, onDelete }: {
   const [name, setName] = useState(category.name);
   const nameOk = name.trim().length > 0;
   const dirty = !sameConfig(draft, saved) || (!category.protected && name.trim() !== category.name);
+  useEffect(() => { onDirtyChange(dirty); }, [dirty]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => onDirtyChange(false), []); // eslint-disable-line react-hooks/exhaustive-deps
   const inUse = (category.typeCount ?? 0) > 0;
   return (
     <Card className="animate-slide-up transition-shadow duration-300 hover:shadow-soft">
@@ -41,7 +43,7 @@ export function CategoryCard({ category, saving, onSave, onDelete }: {
               hint={category.protected ? "El sistema usa esta categoría en los comprobantes; su nombre no cambia." : undefined} />
             <ConfigFields value={draft} onChange={setDraft} />
             <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-              <Button variant="danger" onClick={onDelete} disabled={category.protected || inUse} title={inUse ? "Tiene tipos asociados" : undefined}>
+              <Button variant="danger" onClick={onDelete} disabled={saving || category.protected || inUse} title={inUse ? "Tiene tipos asociados" : undefined}>
                 <Trash2 className="h-4 w-4" aria-hidden="true" />Eliminar
               </Button>
               <span className="flex gap-2">
