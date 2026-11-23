@@ -38,7 +38,7 @@ export function MovementsTable({ rows, isIncome, onEdit, onDelete, onPrint }: Pr
               <Td className="whitespace-nowrap text-right font-medium tabular-nums">{money(m.amount)} {m.fixedAmount && <span className="ml-1 text-xs text-muted">(fijo)</span>}</Td>
               <Td>
                 <div className="flex justify-end gap-1">
-                  {onPrint && m.categoryCode === "ESTIPENDIO" && (
+                  {onPrint && (
                     <Button size="sm" variant="ghost" aria-label={`Imprimir comprobante de ${m.typeName}`} title="Imprimir comprobante (media hoja carta)" onClick={() => onPrint(m)}><Printer className="h-3.5 w-3.5" /></Button>
                   )}
                   {m.periodStatus === "OPEN" && (
